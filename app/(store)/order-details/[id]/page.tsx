@@ -1,4 +1,4 @@
-import { OrderConfirmationPage } from "@/components/storefront-pages";
+import OrderConfirmationPage from "../../order-confirmation/page";
 
 export default async function Page({
   params,

@@ -1,4 +1,4 @@
-import { LegalPage } from "@/components/storefront-pages";
+import { LegalPage } from "@/components/Legal";
 
 export default function Page() {
   return <LegalPage type="privacy" />;

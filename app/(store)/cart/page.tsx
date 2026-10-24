@@ -1,5 +1,130 @@
-import { CartPage } from "@/components/storefront-pages";
+"use client";
 
-export default function Page() {
-  return <CartPage />;
+import {
+  buttonClass,
+  EmptyState,
+  imageUrl,
+  money,
+  OrderSummary,
+  SectionTitle,
+} from "@/components/storefront-ui";
+import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
+import { removeFromCart, updateCartItem } from "@/lib/store/store";
+import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
+
+export default function CartPage() {
+  const cart = useAppSelector((state) => state.app.cart);
+  const dispatch = useAppDispatch();
+  const subtotal = cart.reduce(
+    (sum, item) => sum + item.food.price * item.quantity,
+    0,
+  );
+  const delivery = subtotal >= 30_000 ? 0 : 2_000;
+  if (!cart.length)
+    return (
+      <EmptyState
+        title="Your bag is waiting."
+        text="Add something delicious to the cart to get started."
+        href="/#products"
+        action="Back to Home"
+      />
+    );
+  return (
+    <main className="shell py-14">
+      <SectionTitle eyebrow="Your order" title="Good choices." />
+      <div className="grid gap-10 lg:grid-cols-[1fr_380px]">
+        <div className="space-y-4">
+          {cart.map(({ food, quantity }) => (
+            <div
+              key={food.id}
+              className="flex gap-4 rounded-3xl bg-white p-4 soft-ring"
+            >
+              <div className="size-28 shrink-0 overflow-hidden rounded-2xl bg-stone-100">
+                {imageUrl(food.image) && (
+                  <img
+                    src={imageUrl(food.image)}
+                    alt=""
+                    className="size-full object-cover"
+                  />
+                )}
+              </div>
+              <div className="flex flex-1 flex-col justify-between py-1">
+                <div className="flex justify-between gap-4">
+                  <div>
+                    <Link
+                      href={`/food/${food.slug}`}
+                      className="font-display text-lg font-bold"
+                    >
+                      {food.name}
+                    </Link>
+                    <p className="mt-1 text-sm text-stone-500">
+                      {money(food.price)}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => dispatch(removeFromCart(food.id))}
+                    className="text-stone-400 transition hover:text-red-500"
+                    aria-label="Remove item"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center rounded-full border border-stone-200">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        dispatch(
+                          updateCartItem({
+                            id: food.id,
+                            quantity: quantity - 1,
+                          }),
+                        )
+                      }
+                      className="p-2.5"
+                      aria-label={`Remove one ${food.name}`}
+                    >
+                      <Minus size={14} />
+                    </button>
+                    <span className="w-7 text-center text-sm font-bold">
+                      {quantity}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        dispatch(
+                          updateCartItem({
+                            id: food.id,
+                            quantity: quantity + 1,
+                          }),
+                        )
+                      }
+                      className="p-2.5"
+                      aria-label={`Add one ${food.name}`}
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </div>
+                  <span className="font-bold">
+                    {money(food.price * quantity)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <OrderSummary
+          subtotal={subtotal}
+          delivery={delivery}
+          action={
+            <Link href="/checkout" className={`${buttonClass} w-full`}>
+              Continue to checkout <ArrowRight size={17} />
+            </Link>
+          }
+        />
+      </div>
+    </main>
+  );
 }

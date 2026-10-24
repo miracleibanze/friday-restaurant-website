@@ -15,9 +15,9 @@ export default function NotFound() {
       </p>
       <Link
         className="mt-8 rounded-full bg-friday px-6 py-3 font-bold text-white transition hover:bg-friday-dark"
-        href="/menu"
+        href="/"
       >
-        Explore the menu
+        Back to Home
       </Link>
     </main>
   );

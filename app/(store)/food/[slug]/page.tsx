@@ -1,15 +1,18 @@
-import { FoodDetailsPage } from "@/components/storefront-pages";
-import { menuFoods } from "@/lib/menu-data";
+import FoodDetailsPage from "@/components/FoodDetails"; 
+import { menuFoods } from "@/lib/menu-data"; 
 
-export function generateStaticParams() {
-  return menuFoods.map(({ slug }) => ({ slug }));
+// 1. Emeza neza ko generateStaticParams isohora ibintu mu buryo bugaragara
+export function generateStaticParams() { 
+  return menuFoods.map(({ slug }) => ({ slug })); 
+} 
+
+interface PageProps {
+  params: Promise<{ slug: string }>;
 }
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  return <FoodDetailsPage slug={slug} />;
+// 2. Koresha uburyo busanzwe bwo gutegereza (await) params
+export default async function Page({ params }: PageProps) { 
+  const { slug } = await params; 
+  
+  return <FoodDetailsPage slug={slug} />; 
 }

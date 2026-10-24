@@ -1,5 +1,96 @@
-import { ContactPage } from "@/components/storefront-pages";
+"use client";
 
-export default function Page() {
-  return <ContactPage />;
+import {
+  buttonClass,
+  Field,
+  inputClass,
+  SectionTitle,
+} from "@/components/storefront-ui";
+import { ArrowRight, Clock3, Mail, MapPin, Phone } from "lucide-react";
+import { useState, type FormEvent } from "react";
+
+export default function ContactPage() {
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    try {
+      const messages = JSON.parse(
+        localStorage.getItem("friday-contact-messages") || "[]",
+      );
+      messages.push({
+        ...Object.fromEntries(new FormData(event.currentTarget)),
+        createdAt: new Date().toISOString(),
+      });
+      localStorage.setItem("friday-contact-messages", JSON.stringify(messages));
+      setSent(true);
+      event.currentTarget.reset();
+    } catch {
+      setError("We could not save your message. Please try again.");
+    }
+  }
+  return (
+    <main className="shell py-14">
+      <SectionTitle
+        eyebrow="Talk to us"
+        title="We’d love to hear from you."
+        text="Questions, feedback or a special request? Call or email our Kigali team."
+      />
+      <div className="grid gap-8 lg:grid-cols-[.75fr_1.25fr]">
+        <div className="rounded-[2rem] bg-charcoal p-8 text-white">
+          <h2 className="font-display text-2xl font-bold">Friday Restaurant</h2>
+          <div className="mt-8 space-y-6 text-sm text-stone-300">
+            <p className="flex gap-3">
+              <MapPin className="text-friday" /> KG 7 Ave, Kimihurura
+              <br />
+              Kigali, Rwanda
+            </p>
+            <p className="flex gap-3">
+              <Phone className="text-friday" /> +250 788 123 456
+            </p>
+            <p className="flex gap-3">
+              <Mail className="text-friday" /> hello@friday.rw
+            </p>
+            <p className="flex gap-3">
+              <Clock3 className="text-friday" /> Daily, 10:00–22:30
+            </p>
+          </div>
+        </div>
+        <form
+          onSubmit={submit}
+          className="rounded-[2rem] bg-white p-7 soft-ring md:p-9"
+        >
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field name="name" label="Your name" required />
+            <Field name="email" type="email" label="Email address" required />
+            <div className="sm:col-span-2">
+              <Field name="subject" label="Subject" required />
+            </div>
+            <label className="block text-sm font-semibold sm:col-span-2">
+              Message
+              <textarea
+                name="message"
+                className={`${inputClass} mt-2 min-h-36 resize-none`}
+                required
+              />
+            </label>
+          </div>
+          {sent && (
+            <p className="mt-5 rounded-2xl bg-green-50 p-4 text-sm font-bold text-green-700">
+              Thanks! Your message has been saved in this browser.
+            </p>
+          )}
+          {error && (
+            <p role="alert" className="mt-5 text-sm font-bold text-red-600">
+              {error}
+            </p>
+          )}
+          <button className={`${buttonClass} mt-6`}>
+            Save message <ArrowRight size={17} />
+          </button>
+        </form>
+      </div>
+    </main>
+  );
 }
