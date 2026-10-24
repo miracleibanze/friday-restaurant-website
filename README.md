@@ -43,7 +43,7 @@ All APIs are implemented as Next.js Route Handlers under `app/api`:
 - `POST /api/orders` — create an order. Guests may order too; signed-in customer orders are linked to their MongoDB user record.
 - `GET /api/orders` — list the signed-in customer's orders.
 - `GET /api/orders?orderNumber=FR-...` — public order status lookup (does not disclose delivery address or customer contact details).
-- `GET /api/admin/orders` — admin-only order list. Supports `status` and `search` query parameters.
+- `GET /api/admin/orders` — admin-only paginated order list. Supports `status`, `search`, `page` (1-based), and `pageSize` (`10`, `20`, `50`, or `100`) query parameters. Returns the filtered `total`, current `page`, `pageSize`, and `pages` alongside the orders; status counts remain global.
 - `PATCH /api/admin/orders` — admin-only order status update with `{ "id": "...", "status": "confirmed" | "preparing" | "on-the-way" | "delivered" | "cancelled" }`.
 
 The admin dashboard is at `/admin`. It polls for new orders every 15 seconds and can search, filter, inspect, and update orders.

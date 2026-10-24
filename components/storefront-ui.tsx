@@ -68,14 +68,14 @@ export function Logo() {
   );
 }
 
-export function StoreHeader() {
+export function StoreHeader({ minimal = false }: { minimal?: boolean }) {
   const cart = useAppSelector((state) => state.app.cart);
   const user = useAppSelector((state) => state.app.user);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const [cartList, setCartList] = useState(false);
   const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const linksNeeded = !["/login", "/register", "/forgot-password"].some(
+  const linksNeeded = !minimal && !["/login", "/register", "/forgot-password"].some(
     (path) => pathname.startsWith(path),
   );
 
@@ -124,7 +124,7 @@ export function StoreHeader() {
                 <CircleUserRound size={21} />
               </Link>
             )}
-            <div className="relative">
+            {linksNeeded && <div className="relative">
               <Link
                 aria-label={`Cart (${count} items)`}
                 href="/cart"
@@ -182,15 +182,15 @@ export function StoreHeader() {
                   </div>
                 </div>
               )}
-            </div>
-            <button
+            </div>}
+            {!minimal && <button
               type="button"
               aria-label="Toggle navigation"
               onClick={() => setOpen(!open)}
               className="flex size-11 items-center justify-center rounded-full lg:hidden"
             >
               {open ? <X /> : <MenuIcon />}
-            </button>
+            </button>}
           </div>
         </div>
         {open && (

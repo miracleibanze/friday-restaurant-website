@@ -53,7 +53,7 @@ export default function CartPage() {
                 )}
               </div>
               <div className="flex flex-1 flex-col justify-between py-1">
-                <div className="flex justify-between gap-4">
+                <div className="flex justify-between gap-4 mb-2">
                   <div>
                     <Link
                       href={`/food/${food.slug}`}
@@ -74,7 +74,7 @@ export default function CartPage() {
                     <Trash2 size={18} />
                   </button>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap">
                   <div className="flex items-center rounded-full border border-stone-200">
                     <button
                       type="button"
