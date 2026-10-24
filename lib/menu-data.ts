@@ -16,7 +16,7 @@ export type Food = {
   prepTime?: number;
   rating?: number;
   calories?: number;
-  image?: Media;
+  image: string;
   category?: Category;
 };
 
@@ -52,7 +52,7 @@ const meals: Array<{
     description:
       "Marinated full chicken, flame grilled and served with golden fries and house slaw.",
     price: 12500,
-    image: photos.chicken,
+    image: "/Chicken.jpg",
     calories: 680,
   },
   {
@@ -61,7 +61,7 @@ const meals: Array<{
     description:
       "Slow-grilled fish brushed by our best and incredible Kigali chefs.",
     price: 14000,
-    image: photos.bbq,
+    image: "/Fish.jpg",
     calories: 720,
   },
 ];
@@ -77,6 +77,6 @@ export const menuFoods: Food[] = meals.map((meal, index) => {
     prepTime: meal.prepTime ?? 25,
     rating: 4.7 + (index % 3) / 10,
     calories: meal.calories,
-    image: { url: meal.image, alt: meal.name },
+    image: meal.image,
   };
 });

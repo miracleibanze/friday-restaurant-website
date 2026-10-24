@@ -22,6 +22,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { addToCart, type Order } from "@/lib/store/store";
 import type { Food } from "@/lib/menu-data";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 export const money = (value: number) =>
   `${new Intl.NumberFormat("en-RW").format(value)} RWF`;
@@ -29,8 +30,6 @@ export const inputClass =
   "w-full rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-sm outline-none transition placeholder:text-stone-400 focus:border-friday focus:ring-4 focus:ring-orange-100";
 export const buttonClass =
   "inline-flex items-center justify-center gap-2 rounded-full bg-friday px-6 py-3.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-friday-dark disabled:cursor-not-allowed disabled:opacity-50";
-export const imageUrl = (media?: { url?: string }) => media?.url || "";
-
 export function PageLoader({ label }: { label: string }) {
   return (
     <main className="shell grid min-h-[60vh] place-items-center py-14">
@@ -58,9 +57,13 @@ export function Logo() {
       className="flex items-center gap-2.5"
       aria-label="Friday Restaurant home"
     >
-      <span className="bg-friday flex size-10 items-center justify-center rounded-full text-white">
-        <UtensilsCrossed size={19} />
-      </span>
+      <Image
+        src="/logo.png"
+        alt="Friday Restaurant"
+        width={30}
+        height={30}
+        className="object-contain size-10 "
+      />
       <span className="font-display lg:text-2xl text-xl font-bold tracking-tight">
         Friday<span className="text-friday">Restaurant</span>.
       </span>
@@ -75,9 +78,11 @@ export function StoreHeader({ minimal = false }: { minimal?: boolean }) {
   const pathname = usePathname();
   const [cartList, setCartList] = useState(false);
   const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const linksNeeded = !minimal && !["/login", "/register", "/forgot-password"].some(
-    (path) => pathname.startsWith(path),
-  );
+  const linksNeeded =
+    !minimal &&
+    !["/login", "/register", "/forgot-password"].some((path) =>
+      pathname.startsWith(path),
+    );
 
   const links = [
     ["Home", "/"],
@@ -92,6 +97,9 @@ export function StoreHeader({ minimal = false }: { minimal?: boolean }) {
 
   useEffect(() => {
     if (cart.length > 0) setCartList(true);
+    setTimeout(() => {
+      setCartList(false);
+    }, 3000);
   }, [cart]);
   return (
     <>
@@ -124,73 +132,77 @@ export function StoreHeader({ minimal = false }: { minimal?: boolean }) {
                 <CircleUserRound size={21} />
               </Link>
             )}
-            {linksNeeded && <div className="relative">
-              <Link
-                aria-label={`Cart (${count} items)`}
-                href="/cart"
-                className="relative flex lg:size-11 size-9 items-center justify-center rounded-full bg-charcoal text-white transition hover:bg-friday"
-              >
-                <svg
-                  data-v-26afd543=""
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-5 h-5"
+            {linksNeeded && (
+              <div className="relative">
+                <Link
+                  aria-label={`Cart (${count} items)`}
+                  href="/cart"
+                  className="relative flex lg:size-11 size-9 items-center justify-center rounded-full bg-charcoal text-white transition hover:bg-friday"
                 >
-                  <path
+                  <svg
                     data-v-26afd543=""
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                  ></path>
-                </svg>
-                {count > 0 && (
-                  <>
-                    <span className="bg-friday absolute lg:-right-1 -right-2 lg:-top-1 -top-2 flex size-5 items-center justify-center rounded-full text-[10px] font-bold ring-2 ring-cream">
-                      {count}
-                    </span>
-                  </>
-                )}
-              </Link>
-              {cartList && (
-                <div
-                  id="dropMenu"
-                  className="hidden lg:block bg-white border border-black/10 absolute! top-full translate-y-2  rounded-xl min-w-40 max-w-max right-0 left-auto text-charcoal"
-                >
-                  {cart.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center w-full hover:bg-secondary duration-300 transition-all py-2 px-3 text-[15px] border-b border-black/10"
-                    >
-                      <div className="flex-1">
-                        <h4 className="text-[18px] font-semibold leading-none">
-                          {item.food.name}
-                        </h4>
-                      </div>
-                      <span className="text-[12px] bg-black text-white rounded-full p-1 h-5 w-5 flex-0 flex items-center justify-center aspect-square">
-                        {item.quantity}
-                      </span>
-                    </div>
-                  ))}
-                  <div
-                    className="w-full flex items-center justify-center"
-                    onClick={toggleCart}
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-5 h-5"
                   >
-                    <ChevronUp size={20} />
+                    <path
+                      data-v-26afd543=""
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                    ></path>
+                  </svg>
+                  {count > 0 && (
+                    <>
+                      <span className="bg-friday absolute lg:-right-1 -right-2 lg:-top-1 -top-2 flex size-5 items-center justify-center rounded-full text-[10px] font-bold ring-2 ring-cream">
+                        {count}
+                      </span>
+                    </>
+                  )}
+                </Link>
+                {cartList && (
+                  <div
+                    id="dropMenu"
+                    className="hidden lg:block bg-white border border-black/10 absolute! top-full translate-y-2  rounded-xl min-w-40 max-w-max right-0 left-auto text-charcoal"
+                  >
+                    {cart.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center w-full hover:bg-secondary duration-300 transition-all py-2 px-3 text-[15px] border-b border-black/10"
+                      >
+                        <div className="flex-1">
+                          <h4 className="text-[18px] font-semibold leading-none">
+                            {item.food.name}
+                          </h4>
+                        </div>
+                        <span className="text-[12px] bg-black text-white rounded-full p-1 h-5 w-5 flex-0 flex items-center justify-center aspect-square">
+                          {item.quantity}
+                        </span>
+                      </div>
+                    ))}
+                    <div
+                      className="w-full flex items-center justify-center"
+                      onClick={toggleCart}
+                    >
+                      <ChevronUp size={20} />
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>}
-            {!minimal && <button
-              type="button"
-              aria-label="Toggle navigation"
-              onClick={() => setOpen(!open)}
-              className="flex size-11 items-center justify-center rounded-full lg:hidden"
-            >
-              {open ? <X /> : <MenuIcon />}
-            </button>}
+                )}
+              </div>
+            )}
+            {!minimal && (
+              <button
+                type="button"
+                aria-label="Toggle navigation"
+                onClick={() => setOpen(!open)}
+                className="flex size-11 items-center justify-center rounded-full lg:hidden"
+              >
+                {open ? <X /> : <MenuIcon />}
+              </button>
+            )}
           </div>
         </div>
         {open && (
@@ -319,13 +331,13 @@ export function FoodCard({
         href={`/food/${food.slug}`}
         className="relative block aspect-[4/3] overflow-hidden bg-stone-100"
       >
-        {imageUrl(food.image) && (
-          <img
-            src={imageUrl(food.image)}
-            alt={food.image?.alt || food.name}
-            className="size-full object-cover transition duration-700 group-hover:scale-105"
-          />
-        )}
+        <Image
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          src={food.image}
+          alt={food.name}
+          className="size-full object-cover transition duration-700 group-hover:scale-105"
+        />
         <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold backdrop-blur">
           {food.category?.name}
         </span>

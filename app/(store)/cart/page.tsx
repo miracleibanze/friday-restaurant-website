@@ -3,7 +3,6 @@
 import {
   buttonClass,
   EmptyState,
-  imageUrl,
   money,
   OrderSummary,
   PageLoader,
@@ -44,13 +43,11 @@ export default function CartPage() {
               className="flex gap-4 rounded-3xl bg-white p-4 soft-ring"
             >
               <div className="size-28 shrink-0 overflow-hidden rounded-2xl bg-stone-100">
-                {imageUrl(food.image) && (
-                  <img
-                    src={imageUrl(food.image)}
-                    alt=""
-                    className="size-full object-cover"
-                  />
-                )}
+                <img
+                  src={food.image}
+                  alt={food.name}
+                  className="size-full object-cover"
+                />
               </div>
               <div className="flex flex-1 flex-col justify-between py-1">
                 <div className="flex justify-between gap-4 mb-2">

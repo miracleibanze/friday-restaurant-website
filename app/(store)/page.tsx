@@ -3,7 +3,6 @@
 import {
   buttonClass,
   FoodCard,
-  imageUrl,
   SectionTitle,
   useAddFood,
 } from "@/components/storefront-ui";
@@ -15,7 +14,7 @@ export default function HomePage() {
   const add = useAddFood();
   return (
     <>
-      <section className="relative overflow-hidden bg-gradient pb-8">
+      <section className="relative overflow-hidden bg-gradient pb-8 scroll-mt-16">
         <div className="shell grid lg:min-h-[600px] min-h-[500px] items-center gap-12 pb-14 pt-2 lg:pt-0 lg:grid-cols-[.9fr_1.1fr]">
           <div className="relative z-10 max-lg:flex flex-col items-center text-center">
             <p className="text-friday mb-5 text-xs font-bold uppercase tracking-[.24em]">
@@ -69,7 +68,7 @@ export default function HomePage() {
       </section>
       <section
         id="products"
-        className="bg-[#fcfcfc] py-20 rounded-t-[2.5rem] -translate-y-8 border border-white scroll-mt-24"
+        className="bg-[#fcfcfc] py-20 rounded-t-[2.5rem] -translate-y-8 border border-white scroll-mt-10"
       >
         <div className="shell">
           <SectionTitle

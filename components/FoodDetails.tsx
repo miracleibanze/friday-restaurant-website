@@ -3,7 +3,6 @@
 import {
   buttonClass,
   EmptyState,
-  imageUrl,
   money,
   useAddFood,
 } from "@/components/storefront-ui";
@@ -40,13 +39,11 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
       </Link>
       <div className="grid gap-12 lg:grid-cols-2">
         <div className="relative aspect-square overflow-hidden rounded-[2.5rem] bg-white food-shadow">
-          {imageUrl(food.image) && (
-            <img
-              src={imageUrl(food.image)}
-              alt={food.image?.alt || food.name}
-              className="size-full object-cover"
-            />
-          )}
+          <img
+            src={food.image}
+            alt={food.name}
+            className="size-full object-cover"
+          />
         </div>
         <div className="flex flex-col justify-center">
           <span className="text-friday text-xs font-bold uppercase tracking-[.2em]">
