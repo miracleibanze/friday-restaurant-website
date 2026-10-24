@@ -110,7 +110,7 @@ export function StoreHeader({ minimal = false }: { minimal?: boolean }) {
         <div className="shell flex h-15 items-center justify-between">
           <Logo />
           <div className="flex items-center gap-1.5">
-            <nav className="hidden items-center gap-8 lg:flex">
+            <nav className="hidden items-center gap-8 lg:flex mr-4">
               {linksNeeded &&
                 links.map(([label, href]) => (
                   <Link
