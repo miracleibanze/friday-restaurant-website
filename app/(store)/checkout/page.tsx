@@ -8,6 +8,7 @@ import {
   inputClass,
   money,
   OrderSummary,
+  PageLoader,
   SectionTitle,
 } from "@/components/storefront-ui";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
@@ -20,6 +21,8 @@ export default function CheckoutPage() {
   const dispatch = useAppDispatch();
   const cart = useAppSelector((state) => state.app.cart);
   const user = useAppSelector((state) => state.app.user);
+  const initialized = useAppSelector((state) => state.app.initialized);
+  const sessionStatus = useAppSelector((state) => state.app.sessionStatus);
   const subtotal = cart.reduce(
     (sum, item) => sum + item.food.price * item.quantity,
     0,
@@ -27,6 +30,9 @@ export default function CheckoutPage() {
   const delivery = subtotal >= 30_000 ? 0 : 2_000;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  if (!initialized || sessionStatus === "idle" || sessionStatus === "loading") {
+    return <PageLoader label="Preparing your checkout…" />;
+  }
   if (!cart.length)
     return (
       <EmptyState

@@ -8,6 +8,7 @@ import {
   CircleUserRound,
   Clock3,
   MapPin,
+  LoaderCircle,
   Menu as MenuIcon,
   MessageCircle,
   Phone,
@@ -29,6 +30,21 @@ export const inputClass =
 export const buttonClass =
   "inline-flex items-center justify-center gap-2 rounded-full bg-friday px-6 py-3.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-friday-dark disabled:cursor-not-allowed disabled:opacity-50";
 export const imageUrl = (media?: { url?: string }) => media?.url || "";
+
+export function PageLoader({ label }: { label: string }) {
+  return (
+    <main className="shell grid min-h-[60vh] place-items-center py-14">
+      <div
+        role="status"
+        aria-live="polite"
+        className="flex items-center gap-3 text-sm font-semibold text-stone-500"
+      >
+        <LoaderCircle size={20} className="animate-spin text-friday" />
+        <span>{label}</span>
+      </div>
+    </main>
+  );
+}
 
 export function useAddFood() {
   const dispatch = useAppDispatch();

@@ -1,5 +1,6 @@
 import {
   configureStore,
+  createAsyncThunk,
   createSlice,
   type PayloadAction,
 } from "@reduxjs/toolkit";
@@ -38,6 +39,10 @@ type StoreState = {
   orders: Order[];
   lastOrder: Order | null;
   ordersError: string;
+  sessionStatus: "idle" | "loading" | "ready" | "error";
+  sessionRequestId: string;
+  ordersStatus: "idle" | "loading" | "ready" | "error";
+  ordersRequestId: string;
   initialized: boolean;
 };
 
@@ -47,8 +52,41 @@ const initialState: StoreState = {
   orders: [],
   lastOrder: null,
   ordersError: "",
+  sessionStatus: "idle",
+  sessionRequestId: "",
+  ordersStatus: "idle",
+  ordersRequestId: "",
   initialized: false,
 };
+
+export const restoreSession = createAsyncThunk<
+  Customer | null,
+  void,
+  { rejectValue: string }
+>("app/restoreSession", async (_, { rejectWithValue, signal }) => {
+  try {
+    const response = await fetch("/api/auth", { signal });
+    const result = await response.json();
+    if (!response.ok) return rejectWithValue(result.error || "Could not restore account session.");
+    return result.user?.role === "customer" ? (result.user as Customer) : null;
+  } catch {
+    return rejectWithValue("Could not restore account session.");
+  }
+});
+
+export const loadOrders = createAsyncThunk<Order[], void, { rejectValue: string }>(
+  "app/loadOrders",
+  async (_, { rejectWithValue, signal }) => {
+    try {
+      const response = await fetch("/api/orders", { signal });
+      const result = await response.json();
+      if (!response.ok) return rejectWithValue(result.error || "Could not load your orders.");
+      return result.orders as Order[];
+    } catch {
+      return rejectWithValue("Could not load your orders.");
+    }
+  },
+);
 
 const appSlice = createSlice({
   name: "app",
@@ -63,7 +101,15 @@ const appSlice = createSlice({
       state.initialized = true;
     },
     setUser(state, action: PayloadAction<Customer | null>) {
+      if (state.user?.id !== action.payload?.id) {
+        state.orders = [];
+        state.ordersError = "";
+        state.ordersStatus = "idle";
+        state.ordersRequestId = "";
+      }
       state.user = action.payload;
+      state.sessionStatus = "ready";
+      state.sessionRequestId = "";
       if (!action.payload) {
         state.orders = [];
         state.ordersError = "";
@@ -72,9 +118,12 @@ const appSlice = createSlice({
     setOrders(state, action: PayloadAction<Order[]>) {
       state.orders = action.payload;
       state.ordersError = "";
+      state.ordersStatus = "ready";
+      state.ordersRequestId = "";
     },
     setOrdersError(state, action: PayloadAction<string>) {
       state.ordersError = action.payload;
+      state.ordersStatus = "error";
     },
     addToCart(state, action: PayloadAction<{ food: Food; quantity?: number }>) {
       const quantity = action.payload.quantity ?? 1;
@@ -118,6 +167,46 @@ const appSlice = createSlice({
     updateProfile(state, action: PayloadAction<Customer>) {
       state.user = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(restoreSession.pending, (state, action) => {
+        state.sessionStatus = "loading";
+        state.sessionRequestId = action.meta.requestId;
+      })
+      .addCase(restoreSession.fulfilled, (state, action) => {
+        if (state.sessionRequestId !== action.meta.requestId) return;
+        state.user = action.payload;
+        state.sessionStatus = "ready";
+        state.sessionRequestId = "";
+      })
+      .addCase(restoreSession.rejected, (state, action) => {
+        if (state.sessionRequestId !== action.meta.requestId) return;
+        state.sessionStatus = "error";
+        state.sessionRequestId = "";
+      })
+      .addCase(loadOrders.pending, (state, action) => {
+        state.ordersStatus = "loading";
+        state.ordersError = "";
+        state.ordersRequestId = action.meta.requestId;
+      })
+      .addCase(loadOrders.fulfilled, (state, action) => {
+        if (state.ordersRequestId !== action.meta.requestId) return;
+        state.orders = action.payload;
+        state.ordersStatus = "ready";
+        state.ordersError = "";
+        state.ordersRequestId = "";
+      })
+      .addCase(loadOrders.rejected, (state, action) => {
+        if (state.ordersRequestId !== action.meta.requestId) return;
+        state.ordersRequestId = "";
+        if (action.meta.aborted) {
+          state.ordersStatus = "idle";
+          return;
+        }
+        state.ordersStatus = "error";
+        state.ordersError = action.payload || "Could not load your orders.";
+      });
   },
 });
 

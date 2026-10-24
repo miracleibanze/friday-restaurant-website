@@ -4,10 +4,11 @@ import {
   buttonClass,
   EmptyState,
   Field,
+  PageLoader,
   SectionTitle,
 } from "@/components/storefront-ui";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
-import { setOrders, setUser, updateProfile } from "@/lib/store/store";
+import { restoreSession, setOrders, setUser, updateProfile } from "@/lib/store/store";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
@@ -16,10 +17,32 @@ export default function ProfilePage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.app.user);
+  const sessionStatus = useAppSelector((state) => state.app.sessionStatus);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
- 
+  if (sessionStatus === "idle" || sessionStatus === "loading") {
+    return <PageLoader label="Loading your profile…" />;
+  }
+  if (sessionStatus === "error") {
+    return (
+      <main className="shell py-14">
+        <SectionTitle eyebrow="Your account" title="Profile unavailable." />
+        <p role="alert" className="mt-5 text-sm text-red-700">
+          We couldn’t verify your session. Check your connection and try again.
+        </p>
+        <button
+          type="button"
+          onClick={() => void dispatch(restoreSession())}
+          className={`${buttonClass} mt-5`}
+        >
+          Try again
+        </button>
+      </main>
+    );
+  }
 
   if (!user)
     return (
@@ -32,6 +55,7 @@ export default function ProfilePage() {
     );
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setSaving(true);
     setMessage("");
     setError("");
     const data = Object.fromEntries(new FormData(event.currentTarget));
@@ -56,13 +80,22 @@ export default function ProfilePage() {
           ? cause.message
           : "Could not update your profile.",
       );
+    } finally {
+      setSaving(false);
     }
   }
   async function logout() {
-    await fetch("/api/auth", { method: "DELETE" });
-    dispatch(setUser(null));
-    dispatch(setOrders([]));
-    router.push("/");
+    setLoggingOut(true);
+    try {
+      const response = await fetch("/api/auth", { method: "DELETE" });
+      if (!response.ok) throw new Error("Could not sign out. Try again.");
+      dispatch(setUser(null));
+      dispatch(setOrders([]));
+      router.push("/");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not sign out.");
+      setLoggingOut(false);
+    }
   }
   return (
     <main className="shell py-14">
@@ -74,9 +107,10 @@ export default function ProfilePage() {
         <button
           type="button"
           onClick={() => void logout()}
+          disabled={loggingOut}
           className="mb-10 rounded-full border border-stone-200 px-5 py-3 text-sm font-bold"
         >
-          Log out
+          {loggingOut ? "Signing out…" : "Log out"}
         </button>
       </div>
       <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
@@ -128,7 +162,9 @@ export default function ProfilePage() {
               {error}
             </p>
           )}
-          <button className={`${buttonClass} mt-7`}>Save changes</button>
+          <button disabled={saving} className={`${buttonClass} mt-7`}>
+            {saving ? "Saving…" : "Save changes"}
+          </button>
         </form>
       </div>
     </main>

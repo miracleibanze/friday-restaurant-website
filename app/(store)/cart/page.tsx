@@ -6,6 +6,7 @@ import {
   imageUrl,
   money,
   OrderSummary,
+  PageLoader,
   SectionTitle,
 } from "@/components/storefront-ui";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
@@ -15,12 +16,14 @@ import Link from "next/link";
 
 export default function CartPage() {
   const cart = useAppSelector((state) => state.app.cart);
+  const initialized = useAppSelector((state) => state.app.initialized);
   const dispatch = useAppDispatch();
   const subtotal = cart.reduce(
     (sum, item) => sum + item.food.price * item.quantity,
     0,
   );
   const delivery = subtotal >= 30_000 ? 0 : 2_000;
+  if (!initialized) return <PageLoader label="Restoring your basket…" />;
   if (!cart.length)
     return (
       <EmptyState

@@ -3,11 +3,11 @@
 import { useEffect, useRef } from "react";
 import { Provider } from "react-redux";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
-import { makeStore, initialize, setOrders, setOrdersError, setUser } from "@/lib/store/store";
+import { initialize, loadOrders, makeStore, restoreSession, setOrders } from "@/lib/store/store";
 
 function StoreSync() {
   const dispatch = useAppDispatch();
-  const { cart, initialized, user } = useAppSelector((state) => state.app);
+  const { cart, initialized, sessionStatus, user } = useAppSelector((state) => state.app);
   const userId = user?.id;
 
   useEffect(() => {
@@ -22,15 +22,8 @@ function StoreSync() {
     }
 
     dispatch(initialize({ cart: savedCart, lastOrder }));
-    fetch("/api/auth")
-      .then(async (response) => {
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || "Could not restore account session.");
-        dispatch(result.user?.role === "customer" ? setUser(result.user) : setUser(null));
-      })
-      .catch((error: unknown) => {
-        console.error("Could not restore account session.", error);
-      });
+    const request = dispatch(restoreSession());
+    return () => request.abort();
   }, [dispatch]);
 
   useEffect(() => {
@@ -38,23 +31,14 @@ function StoreSync() {
   }, [cart, initialized]);
 
   useEffect(() => {
+    if (sessionStatus !== "ready") return;
     if (!userId) {
       dispatch(setOrders([]));
       return;
     }
-    const controller = new AbortController();
-    fetch("/api/orders", { signal: controller.signal })
-      .then(async (response) => {
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || "Could not load your orders.");
-        dispatch(setOrders(result.orders));
-      })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === "AbortError") return;
-        dispatch(setOrdersError(error instanceof Error ? error.message : "Could not load your orders."));
-      });
-    return () => controller.abort();
-  }, [dispatch, userId]);
+    const request = dispatch(loadOrders());
+    return () => request.abort();
+  }, [dispatch, sessionStatus, userId]);
 
   return null;
 }

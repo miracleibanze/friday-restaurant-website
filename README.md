@@ -1,12 +1,12 @@
 # Friday Restaurant
 
-Restaurant ordering website built with Next.js App Router and MongoDB.
+Restaurant ordering website built with Next.js App Router, Redux Toolkit, and Mongoose.
 
 ## App structure
 
 - Each customer-facing URL has its own `page.tsx` under `app/(store)/`; `app/(store)/layout.tsx` provides the shared navigation and footer.
 - `app/layout.tsx` wraps the application in the React Redux provider.
-- `lib/store/store.ts` owns cart, signed-in customer, and order state. The cart is persisted in the browser; accounts and orders come from the MongoDB API.
+- `lib/store/store.ts` owns cart, signed-in customer, and order state. The cart is persisted in the browser; accounts and orders come from the Mongoose API.
 - `/admin` is a standalone admin dashboard, outside the storefront layout.
 
 ## Run locally
@@ -29,7 +29,7 @@ Restaurant ordering website built with Next.js App Router and MongoDB.
    npm run dev
    ```
 
-Keep `.env.local` private. Do not commit credentials or use `NEXT_PUBLIC_` prefixes for these variables. The app creates the `users` and `orders` collections and their required indexes when first used.
+Keep `.env.local` private. Do not commit credentials or use `NEXT_PUBLIC_` prefixes for these variables. The Mongoose models create the `users` and `orders` collections and their indexes when first used.
 
 ## Backend API
 
@@ -48,11 +48,11 @@ All APIs are implemented as Next.js Route Handlers under `app/api`:
 
 The admin dashboard is at `/admin`. It polls for new orders every 15 seconds and can search, filter, inspect, and update orders.
 
-Passwords are hashed server-side and login sessions use signed, `HttpOnly` cookies. Use HTTPS in production. Order prices and totals are recalculated and validated on the server; the browser's submitted prices are not trusted.
+Passwords are hashed server-side and login sessions use signed, `HttpOnly` cookies. Use HTTPS in production. Order prices and totals are recalculated from the server menu catalog; the browser's submitted prices are not trusted.
 
 ## Current boundaries
 
 - Checkout records the selected payment method but does not charge cards or initiate mobile-money payments.
 - Password reset email delivery is not configured.
 - Contact form messages are kept in the submitting browser; configure a mail or database service before using it as a customer support inbox.
-- Menu content is currently defined in `lib/menu-data.ts`; MongoDB currently stores users and orders.
+- Menu content is currently defined in `lib/menu-data.ts`; MongoDB stores users and orders.

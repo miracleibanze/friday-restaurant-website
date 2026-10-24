@@ -33,6 +33,40 @@ export default function AuthPage({
             "Reset your password.",
             "We’ll send recovery instructions to your email address.",
           ];
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setMessage("");
+    if (mode === "forgot") {
+      setMessage("Password reset email delivery is not configured yet.");
+      return;
+    }
+
+    setLoading(true);
+    const values = Object.fromEntries(new FormData(event.currentTarget));
+    try {
+      const response = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: mode,
+          name: values.name,
+          email: values.email,
+          password: values.password,
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Could not sign in.");
+      dispatch(setUser(result.user));
+      router.push("/profile");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not complete the account request.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <main className="shell grid min-h-[72vh] items-center gap-10 py-14 lg:grid-cols-2">
       <div className="hidden overflow-hidden rounded-[2.5rem] lg:block">
