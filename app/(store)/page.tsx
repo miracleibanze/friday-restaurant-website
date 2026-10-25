@@ -1,13 +1,14 @@
 "use client";
 
 import {
+  BackdropImage,
   buttonClass,
   FoodCard,
   SectionTitle,
   useAddFood,
 } from "@/components/storefront-ui";
 import { menuFoods } from "@/lib/menu-data";
-import { ArrowRight, Clock3, Phone, Star } from "lucide-react";
+import { ArrowRight, Clock3, Phone, Star, WavesVertical } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -15,18 +16,18 @@ export default function HomePage() {
   const add = useAddFood();
   return (
     <>
-      <section className="relative overflow-hidden bg-opacity-gradient lg:bg-gradient pb-8 scroll-mt-16">
-        <div className="shell grid lg:min-h-[600px] min-h-[500px] items-center gap-12 pb-14 pt-2 lg:pt-0 lg:grid-cols-[.9fr_1.1fr]">
-          <div className="relative z-10 max-lg:flex flex-col items-center max-lg:text-center">
+      <section className="relative overflow-hidden bg-opacity-gradient md:bg-gradient pb-8">
+        <div className="shell grid md:min-h-[600px] min-h-[500px] items-center gap-12 pb-14 pt-2 md:pt-0 md:grid-cols-[.9fr_1.1fr]">
+          <div className="relative z-10 max-md:flex flex-col items-center max-md:text-center md:pl-10">
             <p className="text-friday mb-5 text-xs font-bold uppercase tracking-[.24em]">
               Kigali’s feel-good kitchen and fish
             </p>
-            <h1 className="text-balance lg:text-6xl text-5xl font-bold leading-[.96] tracking-tight text-charcoal">
+            <h1 className="font-display text-balance md:text-6xl text-5xl leading-[.96] tracking-tight text-charcoal">
               Order now.
               <br />
-              <em className="text-friday font-semibold">Enjoy the meal.</em>
+              <em className="text-friday">Enjoy the meal.</em>
             </h1>
-            <p className="mt-7 max-w-lg text-md leading-none text-stone-600 lg:text-lg">
+            <p className="mt-7 max-w-lg text-md leading-none text-stone-600 md:text-lg">
               From whole chicken and fish to chicken wings, juicy burgers, and
               more, enjoy delicious meals made for every craving and delivered
               across Kigali.
@@ -52,7 +53,7 @@ export default function HomePage() {
               </span>
             </div>
           </div>
-          <div className="hidden lg:block relative mx-auto w-full max-w-md">
+          <div className="hidden md:block relative mx-auto w-full max-w-md">
             <div className="absolute -inset-12 rounded-full bg-orange-200/50 blur-3xl" />
             <div className="relative aspect-square overflow-hidden rounded-[45%_55%_50%_45%] border-[12px] border-white shadow-xl">
               <img
@@ -62,22 +63,17 @@ export default function HomePage() {
               />
             </div>
             <div className="absolute -bottom-2 -left-3 rounded-2xl bg-white p-4 shadow-lg">
-              <p className="text-xs text-stone-500">Today’s favourite</p>
-              <p className="mt-1 font-bold">Friday Family Feast</p>
+              <p className="text-xs text-stone-500">Make it your own</p>
+              <p className="mt-1 font-bold">Add More to Your Plate</p>
             </div>
+            <WavesVertical className="absolute top-0 text-white right-20 size-24" />
           </div>
         </div>
-        <div className="absolute inset-0 -z-1 overflow-hidden oppacity-30">
-          <img
-            src="/friday-family-feast.jpg"
-            alt=""
-            className="object-cover w-full h-full opacity-30"
-          />
-        </div>
+        <BackdropImage />
       </section>
       <section
         id="products"
-        className="bg-[#fcfcfc] py-20 rounded-t-[2.5rem] -translate-y-8 border border-white scroll-mt-10"
+        className="bg-[#fcfcfc] py-20 rounded-t-[2.5rem] -translate-y-8 border border-white"
       >
         <div className="shell">
           <SectionTitle
@@ -94,7 +90,7 @@ export default function HomePage() {
       </section>
       <section
         id="about"
-        className="shell overflow-hidden rounded-[2.5rem] bg-sage text-white scroll-mt-24"
+        className="shell overflow-hidden rounded-[2.5rem] bg-sage text-white"
       >
         <div className="grid lg:grid-cols-2">
           <img
@@ -106,7 +102,7 @@ export default function HomePage() {
             <p className="mb-4 text-xs font-bold uppercase tracking-[.22em] text-orange-200">
               Our kitchen
             </p>
-            <h2 className="font-display text-4xl font-semibold md:text-5xl">
+            <h2 className="font-display text-4xl md:text-5xl">
               Made with Kigali energy.
             </h2>
             <p className="mt-6 leading-8 text-white/75">
@@ -116,7 +112,7 @@ export default function HomePage() {
             </p>
             <Link
               href="/contact"
-              className="mt-8 inline-flex items-center gap-2 font-bold"
+              className="mt-8 inline-flex items-center gap-2 font-bold bg-friday px-6 py-3.5 text-sm transition hover:bg-friday/90 rounded-full w-max-content"
             >
               Come say hello <ArrowRight size={17} />
             </Link>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { setUser } from "@/lib/store/store";
 import { useAppDispatch } from "@/lib/store/hooks";
-import { buttonClass, Field } from "@/components/storefront-ui";
+import { BackdropImage, buttonClass, Field } from "@/components/storefront-ui";
 
 export default function AuthPage({
   mode,
@@ -72,15 +72,15 @@ export default function AuthPage({
   }
 
   return (
-    <main className="shell grid min-h-[72vh] items-center gap-10 py-14 lg:grid-cols-2">
-      <div className="hidden overflow-hidden rounded-[2.5rem] lg:block">
+    <main className="relative shell grid min-h-[72vh] items-center gap-10 lg:grid-cols-2">
+      <div className="hidden overflow-hidden -m-[4rem] mr-0! rounded-br-[2.5rem] lg:block">
         <img
           src="/friday-family-feast.jpg"
           alt="A fresh Friday Restaurant meal"
           className="h-[620px] w-full object-cover"
         />
       </div>
-      <div className="mx-auto w-full max-w-md">
+      <div className="mx-auto w-full max-w-md py-14">
         <p className="text-friday text-xs font-bold uppercase tracking-[.22em]">
           {mode === "login"
             ? "Customer login"
@@ -88,9 +88,7 @@ export default function AuthPage({
               ? "Join Friday"
               : "Account recovery"}
         </p>
-        <h1 className="font-display mt-3 text-5xl font-semibold">
-          {content[0]}
-        </h1>
+        <h1 className="font-display mt-3 text-5xl">{content[0]}</h1>
         <p className="mt-4 leading-7 text-stone-500">{content[1]}</p>
         <form onSubmit={submit} className="mt-8 space-y-4">
           {mode === "register" && (
@@ -156,6 +154,8 @@ export default function AuthPage({
           </Link>
         )}
       </div>
+
+      <BackdropImage className="lg:hidden block fixed opacity-25" />
     </main>
   );
 }

@@ -6,7 +6,7 @@ export default function NotFound() {
       <p className="text-friday text-sm font-bold uppercase tracking-[.22em]">
         Error 404
       </p>
-      <h1 className="font-display mt-3 text-5xl font-semibold tracking-tight text-charcoal">
+      <h1 className="font-display mt-3 text-5xl tracking-tight text-charcoal">
         This table is empty.
       </h1>
       <p className="mt-4 max-w-md text-stone-600">

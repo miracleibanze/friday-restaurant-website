@@ -49,7 +49,7 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
           <span className="text-friday text-xs font-bold uppercase tracking-[.2em]">
             {food.category?.name}
           </span>
-          <h1 className="font-display mt-4 text-5xl font-semibold leading-tight md:text-6xl">
+          <h1 className="font-display mt-4 text-5xl leading-tight md:text-6xl font-light!">
             {food.name}
           </h1>
           <div className="mt-5 flex gap-5 text-sm text-stone-500">
@@ -66,9 +66,7 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
             {food.description}
           </p>
           <div className="mt-8 border-y border-stone-200 py-7">
-            <p className="font-display text-3xl font-bold">
-              {money(food.price)}
-            </p>
+            <p className="font-display text-3xl">{money(food.price)}</p>
             <p className="mt-1 text-sm text-stone-500">
               Freshly prepared · Delivery available
             </p>

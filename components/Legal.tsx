@@ -45,7 +45,7 @@ export function LegalPage({ type }: { type: "privacy" | "terms" }) {
         </p>
         {items.map(([title, text], index) => (
           <section key={title} className="mt-9">
-            <h2 className="font-display text-2xl font-bold">
+            <h2 className="font-display text-2xl">
               {index + 1}. {title}
             </h2>
             <p className="mt-3 leading-8 text-stone-600">{text}</p>

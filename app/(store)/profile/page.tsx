@@ -8,7 +8,12 @@ import {
   SectionTitle,
 } from "@/components/storefront-ui";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
-import { restoreSession, setOrders, setUser, updateProfile } from "@/lib/store/store";
+import {
+  restoreSession,
+  setOrders,
+  setUser,
+  updateProfile,
+} from "@/lib/store/store";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
@@ -132,7 +137,7 @@ export default function ProfilePage() {
           onSubmit={save}
           className="rounded-3xl bg-white p-7 soft-ring md:p-9"
         >
-          <h2 className="font-display text-2xl font-bold">Personal details</h2>
+          <h2 className="font-display text-2xl">Personal details</h2>
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <Field
               name="name"

@@ -238,9 +238,7 @@ export default function AdminDashboard() {
             <p className="text-xs font-bold uppercase tracking-[.22em] text-friday">
               Friday Restaurant
             </p>
-            <h1 className="font-display mt-3 text-4xl font-bold">
-              Admin sign in
-            </h1>
+            <h1 className="font-display mt-3 text-4xl">Admin sign in</h1>
             <p className="mt-3 text-sm leading-6 text-stone-500">
               Sign in with the admin email and password configured on the
               server.
@@ -301,9 +299,7 @@ export default function AdminDashboard() {
             <p className="text-2xl font-bold uppercase text-friday">
               Friday Restaurant
             </p>
-            <h1 className="font-display mt-1 text-normal font-bold">
-              Order dashboard
-            </h1>
+            <h1 className="font-display mt-1">Order dashboard</h1>
           </div>
           <div className="flex gap-2 ml-auto flex-wrap items-center justify-end sm:gap-3">
             <button
@@ -353,9 +349,7 @@ export default function AdminDashboard() {
         <section className="mt-8 rounded-3xl bg-white p-5 shadow-sm sm:p-7">
           <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
             <div>
-              <h2 className="font-display text-2xl font-bold">
-                Customer orders
-              </h2>
+              <h2 className="font-display text-2xl">Customer orders</h2>
               <p className="mt-1 text-sm text-stone-500">
                 New requests appear automatically every 15 seconds.
               </p>
@@ -421,35 +415,49 @@ export default function AdminDashboard() {
               {orders.map((order) => (
                 <article
                   key={order.id}
-                  className="flex flex-col gap-4 py-5 md:flex-row md:items-center"
+                  className="flex flex-col gap-4 border-b border-stone-200 py-5 last:border-b-0 md:flex-row md:items-center hover:bg-stone-50"
                 >
                   <button
                     type="button"
                     onClick={() => setSelected(order)}
-                    className="min-w-0 flex-1 text-left"
+                    className="min-w-0 flex-1 text-left cursor-pointer"
                   >
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-bold">{order.orderNumber}</span>
                       <StatusPill status={order.status} />
                     </div>
+
                     <p className="mt-1 truncate text-sm text-stone-700">
                       {order.customerName} · {order.email}
                     </p>
+
                     <p className="mt-1 text-xs text-stone-400">
                       {new Date(order.createdAt).toLocaleString()} ·{" "}
                       {order.items.length} item
                       {order.items.length === 1 ? "" : "s"}
                     </p>
+
+                    {order.notes?.trim() && (
+                      <div className="mt-3 rounded-xl bg-stone-200 px-3 py-2">
+                        <p className="text-xs font-semibold text-stone-500">
+                          Customer notes
+                        </p>
+                        <p className="mt-1 whitespace-pre-wrap break-words text-sm text-stone-700">
+                          {order.notes}
+                        </p>
+                      </div>
+                    )}
                   </button>
-                  <div className="flex items-center justify-between gap-3 md:justify-end flex-wrap gap-y-0">
-                    <span className="font-display text-lg font-bold">
+
+                  <div className="flex flex-wrap items-center justify-between gap-3 md:justify-end">
+                    <span className="font-display text-lg">
                       {money(order.total)}
                     </span>
 
-                    <div className="ml-auto flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <select
                         aria-label={`Update ${order.orderNumber} status`}
-                        className="rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm font-semibold"
+                        className="max-w-40 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm font-semibold"
                         value={order.status}
                         disabled={updatingId === order.id}
                         onChange={(event) =>
@@ -465,10 +473,11 @@ export default function AdminDashboard() {
                           </option>
                         ))}
                       </select>
+
                       <button
                         type="button"
                         onClick={() => setSelected(order)}
-                        className="rounded-xl border border-stone-200 px-3 py-2 text-sm font-bold hover:bg-stone-50"
+                        className="rounded-xl border border-stone-200 px-3 py-2 text-sm font-bold transition hover:bg-stone-50"
                       >
                         Details
                       </button>
@@ -564,7 +573,7 @@ function Metric({
         <span>{title}</span>
         <span className="text-friday">{icon}</span>
       </div>
-      <p className="font-display mt-3 text-3xl font-bold">{value}</p>
+      <p className="font-display mt-3 text-3xl">{value}</p>
     </div>
   );
 }
@@ -614,10 +623,7 @@ function OrderModal({
             <p className="text-xs font-bold uppercase tracking-[.18em] text-friday">
               Order request
             </p>
-            <h2
-              id="order-modal-title"
-              className="font-display mt-2 text-3xl font-bold"
-            >
+            <h2 id="order-modal-title" className="font-display mt-2 text-3xl">
               {order.orderNumber}
             </h2>
             <p className="mt-1 text-sm text-stone-500">

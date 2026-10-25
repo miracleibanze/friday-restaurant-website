@@ -65,7 +65,7 @@ export default function OrderHistoryPage() {
               className="flex flex-wrap items-center justify-between gap-5 rounded-3xl bg-white p-6 soft-ring"
             >
               <div>
-                <p className="font-display text-xl font-bold">
+                <p className="font-display text-xl">
                   {order.orderNumber}
                 </p>
                 <p className="mt-1 text-sm text-stone-500">

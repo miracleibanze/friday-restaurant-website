@@ -54,7 +54,7 @@ export default function CartPage() {
                   <div>
                     <Link
                       href={`/food/${food.slug}`}
-                      className="font-display text-lg font-bold"
+                      className="font-display text-lg"
                     >
                       {food.name}
                     </Link>

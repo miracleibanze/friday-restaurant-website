@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Changa+One:ital@0;1&family=Ultra&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -10,11 +11,13 @@
 }
 
 :root {
-  --color-sage: #202b1b;
-  --font-display: "poppins", sans-serif;
+  --font-head: "Ultra", serif;
+  --font-display: "Changa One", sans-serif;
+  --font-all: "poppins", sans-serif;
 }
 * {
   box-sizing: border-box;
+  scroll-margin-top: 5.5rem;
 }
 html {
   scroll-behavior: smooth;
@@ -57,8 +60,11 @@ a {
   background-repeat: no-repeat;
 }
 
+.font-head {
+  font-family: var(--font-head) !important;
+}
 .font-display {
-  font-family: var(--font-display);
+  font-family: var(--font-display) !important;
 }
 .shell {
   width: min(1180px, calc(100% - 2rem));

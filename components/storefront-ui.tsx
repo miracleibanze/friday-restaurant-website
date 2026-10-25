@@ -60,12 +60,12 @@ export function Logo() {
       <Image
         src="/logo.png"
         alt="Friday Restaurant"
-        width={30}
-        height={30}
+        width={100}
+        height={100}
         className="object-contain size-10 "
       />
-      <span className="font-display lg:text-2xl text-xl font-bold tracking-tight">
-        Friday<span className="text-friday">Restaurant</span>.
+      <span className="font-head lg:text-2xl text-xl tracking-tight">
+        Friday<span className="text-friday">.</span>
       </span>
     </Link>
   );
@@ -249,7 +249,7 @@ export function StoreFooter() {
           </div>
         </div>
         <div>
-          <p className="font-display text-lg font-bold">Explore</p>
+          <p className="font-display text-lg">Explore</p>
           <div className="mt-5 flex flex-col gap-3 text-sm text-stone-400">
             <Link href="/#products">Our Meals</Link>
             <Link href="/order-tracking">Track an order</Link>
@@ -257,7 +257,7 @@ export function StoreFooter() {
           </div>
         </div>
         <div>
-          <p className="font-display text-lg font-bold">Legal</p>
+          <p className="font-display text-lg">Legal</p>
           <div className="mt-5 flex flex-col gap-3 text-sm text-stone-400">
             <Link href="/privacy-policy">Privacy policy</Link>
             <Link href="/terms">Terms of service</Link>
@@ -265,7 +265,7 @@ export function StoreFooter() {
           </div>
         </div>
         <div>
-          <p className="font-display text-lg font-bold">Visit Friday</p>
+          <p className="font-display text-lg">Visit Friday</p>
           <div className="mt-5 space-y-3 text-sm text-stone-400">
             <p className="flex gap-3">
               <MapPin size={18} className="text-friday" /> KG 7 Ave, Kigali,
@@ -287,6 +287,19 @@ export function StoreFooter() {
   );
 }
 
+export const BackdropImage = ({ className }: { className?: string }) => {
+  return (
+    <div
+      className={`absolute inset-0 -z-1 overflow-hidden oppacity-30 ${className || ""}`}
+    >
+      <img
+        src="/friday-family-feast.jpg"
+        alt=""
+        className="object-cover w-full h-full opacity-30"
+      />
+    </div>
+  );
+};
 export function SectionTitle({
   eyebrow,
   title,
@@ -303,7 +316,7 @@ export function SectionTitle({
           {eyebrow}
         </p>
       )}
-      <h2 className="font-display text-balance md:text-4xl text-3xl font-bold leading-tight">
+      <h2 className="font-display text-balance md:text-4xl text-3xl leading-tight">
         {title}
       </h2>
       {text && (
@@ -352,11 +365,11 @@ export function FoodCard({
           <div>
             <Link
               href={`/food/${food.slug}`}
-              className="font-display text-xl font-bold leading-tight transition hover:text-friday"
+              className="text-xl font-bold leading-tight transition hover:text-friday"
             >
               {food.name}
             </Link>
-            <p className="mt-2 line-clamp-2 text-sm leading-6 text-stone-500">
+            <p className="mt-2 line-clamp-2 text-sm leading-tight text-stone-500">
               {food.description}
             </p>
           </div>
@@ -366,9 +379,7 @@ export function FoodCard({
           </span>
         </div>
         <div className="mt-5 flex items-center justify-between">
-          <span className="font-display text-lg font-bold">
-            {money(food.price)}
-          </span>
+          <span className="font-bold text-lg">{money(food.price)}</span>
           <button
             type="button"
             disabled={!food.available}
@@ -401,7 +412,7 @@ export function EmptyState({
     <main
       className={`shell flex flex-col items-center justify-center text-center ${compact ? "py-12" : "min-h-[60vh] py-20"}`}
     >
-      <h1 className="font-display text-3xl font-bold">{title}</h1>
+      <h1 className="font-display text-3xl">{title}</h1>
       <p className="mt-3 max-w-md leading-7 text-stone-500">{text}</p>
       <Link href={href} className={`${buttonClass} mt-7`}>
         {action}
@@ -421,7 +432,7 @@ export function OrderSummary({
 }) {
   return (
     <aside className="h-fit rounded-3xl bg-charcoal p-7 text-white">
-      <h2 className="font-display text-2xl font-bold">Order summary</h2>
+      <h2 className="font-display text-2xl font-light">Order summary</h2>
       <div className="mt-6 space-y-4 border-b border-white/10 pb-6 text-sm">
         <div className="flex justify-between text-stone-400">
           <span>Subtotal</span>
@@ -436,7 +447,7 @@ export function OrderSummary({
       </div>
       <div className="my-6 flex items-end justify-between">
         <span className="font-bold">Total</span>
-        <span className="font-display text-2xl font-bold">
+        <span className="font-display text-2xl">
           {money(subtotal + delivery)}
         </span>
       </div>
@@ -457,7 +468,7 @@ export function FormSection({
 }) {
   return (
     <section className="rounded-3xl bg-white p-6 soft-ring md:p-8">
-      <h2 className="font-display mb-6 text-2xl font-bold">{title}</h2>
+      <h2 className="font-display mb-6 text-2xl">{title}</h2>
       {children}
     </section>
   );
@@ -494,7 +505,7 @@ export function ConfirmedOrder({ order }: { order: Order | null }) {
         <p className="text-friday mt-8 text-xs font-bold uppercase tracking-[.22em]">
           Order {order.status}
         </p>
-        <h1 className="font-display mt-3 text-4xl font-semibold">
+        <h1 className="font-display mt-3 text-3xl leading-tight md:text-4xl">
           {order.status === "confirmed"
             ? "Dinner is on its way."
             : "Your order update."}

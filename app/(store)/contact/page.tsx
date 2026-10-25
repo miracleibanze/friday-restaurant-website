@@ -39,7 +39,9 @@ export default function ContactPage() {
       />
       <div className="grid gap-8 lg:grid-cols-[.75fr_1.25fr]">
         <div className="rounded-[2rem] bg-charcoal p-8 text-white">
-          <h2 className="font-display text-2xl font-bold">Friday Restaurant</h2>
+          <h2 className="font-display text-2xl text-charcoal-50">
+            Friday Restaurant
+          </h2>
           <div className="mt-8 space-y-6 text-sm text-stone-300">
             <p className="flex gap-3">
               <MapPin className="text-friday" /> KG 7 Ave, Kimihurura
