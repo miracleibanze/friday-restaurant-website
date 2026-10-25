@@ -61,7 +61,11 @@ export default function AuthPage({
       dispatch(setUser(result.user));
       router.push("/profile");
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not complete the account request.");
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "Could not complete the account request.",
+      );
     } finally {
       setLoading(false);
     }
@@ -71,7 +75,7 @@ export default function AuthPage({
     <main className="shell grid min-h-[72vh] items-center gap-10 py-14 lg:grid-cols-2">
       <div className="hidden overflow-hidden rounded-[2.5rem] lg:block">
         <img
-          src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=85"
+          src="/friday-family-feast.jpg"
           alt="A fresh Friday Restaurant meal"
           className="h-[620px] w-full object-cover"
         />

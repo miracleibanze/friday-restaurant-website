@@ -139,11 +139,12 @@ export default function CheckoutPage() {
                 </label>
               ))}
               <p className="sm:col-span-3">
-                To Place an ORDER, See our Menu, Call us on 0784684651 /
-                0788517974 and let us know what you want. You then Make Payment
-                via MOMO CODE:*182*8*1*651239# Friday Restaurant Ltd Or Via
-                Airtel Money *182*8*1*444893# Friday Restaurant Ltd. We then
-                Deliver to where you are.
+                To Place an ORDER, See our Menu, Call us on{" "}
+                <strong>+250 782 723 621</strong> and let us know what you want.
+                You then Make Payment via{" "}
+                <strong>MOMO CODE: *182*8*1*------#</strong> Friday Restaurant
+                Ltd Or Via <strong>Airtel Money *182*8*1*88------#</strong>{" "}
+                Friday Restaurant Ltd. We then Deliver to where you are.
               </p>
             </div>
           </FormSection>

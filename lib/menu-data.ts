@@ -36,7 +36,6 @@ const photos = {
   feast:
     "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=85",
 };
-
 const meals: Array<{
   name: string;
   slug: string;
@@ -49,8 +48,7 @@ const meals: Array<{
   {
     name: "Full Chicken",
     slug: "full-chicken",
-    description:
-      "Marinated full chicken, flame grilled and served with golden fries and house slaw.",
+    description: "A whole chicken, perfect for sharing with family or friends.",
     price: 12500,
     image: "/Chicken.jpg",
     calories: 680,
@@ -58,11 +56,45 @@ const meals: Array<{
   {
     name: "Full Fish",
     slug: "full-fish",
-    description:
-      "Slow-grilled fish brushed by our best and incredible Kigali chefs.",
+    description: "A whole fish prepared for a satisfying and delicious meal.",
     price: 14000,
     image: "/Fish.jpg",
     calories: 720,
+  },
+  {
+    name: "Half Chicken",
+    slug: "half-chicken",
+    description: "Half a chicken, a satisfying meal for one or to share.",
+    price: 7000,
+    image: "/Half-Chicken.jpg",
+  },
+  {
+    name: "Chicken Wings",
+    slug: "chicken-wings",
+    description: "Chicken wings prepared for a tasty and satisfying meal.",
+    price: 5000,
+    image: "/Chicken-Wings.jpg",
+  },
+  {
+    name: "Chicken Leg",
+    slug: "chicken-leg",
+    description: "A chicken leg served as a simple and satisfying meal.",
+    price: 3000,
+    image: "/Chicken-Legs.jpg",
+  },
+  {
+    name: "Chicken Burger",
+    slug: "chicken-burger",
+    description: "A burger filled with chicken, served in a soft bun.",
+    price: 5000,
+    image: "/Chicken-Burger.jpg",
+  },
+  {
+    name: "Beef Burger",
+    slug: "beef-burger",
+    description: "A beef burger served in a soft bun for a filling meal.",
+    price: 6000,
+    image: "/Beef-Burger.jpg",
   },
 ];
 

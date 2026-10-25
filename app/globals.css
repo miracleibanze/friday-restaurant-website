@@ -5,11 +5,12 @@
   --color-friday-dark: #d84412;
   --color-cream: #fbf7ef;
   --color-charcoal: #22211f;
-  --color-sage: #62745b;
+  --color-sage: #202b1b;
   --font-sans: var(--font-geist-sans);
 }
 
 :root {
+  --color-sage: #202b1b;
   --font-display: "poppins", sans-serif;
 }
 * {
@@ -38,11 +39,24 @@ a {
     to bottom right,
     #ffdc97 0%,
     #fbf7ef 25%,
-    #fbf7ef 73%,
+    #fbf7ef 75%,
     #fdd88f 100%
   );
   background-repeat: no-repeat;
 }
+
+.bg-opacity-gradient {
+  background: linear-gradient(
+    to bottom right,
+    #ffdc97 0%,
+    #fbf7ef9d 25%,
+    #fbf7ef1e 50%,
+    #fbf7ef9a 75%,
+    #fdd88f 100%
+  );
+  background-repeat: no-repeat;
+}
+
 .font-display {
   font-family: var(--font-display);
 }

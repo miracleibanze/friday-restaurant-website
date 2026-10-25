@@ -8,15 +8,16 @@ import {
 } from "@/components/storefront-ui";
 import { menuFoods } from "@/lib/menu-data";
 import { ArrowRight, Clock3, Phone, Star } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function HomePage() {
   const add = useAddFood();
   return (
     <>
-      <section className="relative overflow-hidden bg-gradient pb-8 scroll-mt-16">
+      <section className="relative overflow-hidden bg-opacity-gradient lg:bg-gradient pb-8 scroll-mt-16">
         <div className="shell grid lg:min-h-[600px] min-h-[500px] items-center gap-12 pb-14 pt-2 lg:pt-0 lg:grid-cols-[.9fr_1.1fr]">
-          <div className="relative z-10 max-lg:flex flex-col items-center text-center">
+          <div className="relative z-10 max-lg:flex flex-col items-center max-lg:text-center">
             <p className="text-friday mb-5 text-xs font-bold uppercase tracking-[.24em]">
               Kigali’s feel-good kitchen and fish
             </p>
@@ -25,9 +26,10 @@ export default function HomePage() {
               <br />
               <em className="text-friday font-semibold">Enjoy the meal.</em>
             </h1>
-            <p className="mt-7 max-w-lg lg:text-lg text-md leading-8 text-stone-600">
-              Freshly grilled favourites and joyful sharing plates of full fish
-              and chicken, made to order and delivered across Kigali.
+            <p className="mt-7 max-w-lg text-md leading-none text-stone-600 lg:text-lg">
+              From whole chicken and fish to chicken wings, juicy burgers, and
+              more, enjoy delicious meals made for every craving and delivered
+              across Kigali.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link href="/#products" className={buttonClass}>
@@ -54,7 +56,7 @@ export default function HomePage() {
             <div className="absolute -inset-12 rounded-full bg-orange-200/50 blur-3xl" />
             <div className="relative aspect-square overflow-hidden rounded-[45%_55%_50%_45%] border-[12px] border-white shadow-xl">
               <img
-                src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=85"
+                src="/friday-family-feast.jpg"
                 alt="Friday Restaurant signature food spread"
                 className="size-full object-cover"
               />
@@ -64,6 +66,13 @@ export default function HomePage() {
               <p className="mt-1 font-bold">Friday Family Feast</p>
             </div>
           </div>
+        </div>
+        <div className="absolute inset-0 -z-1 overflow-hidden oppacity-30">
+          <img
+            src="/friday-family-feast.jpg"
+            alt=""
+            className="object-cover w-full h-full opacity-30"
+          />
         </div>
       </section>
       <section
@@ -89,7 +98,7 @@ export default function HomePage() {
       >
         <div className="grid lg:grid-cols-2">
           <img
-            src="https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=1000&q=85"
+            src="/Chef-Cooking.jpg"
             alt="Friday Restaurant grilled signature dishes"
             className="h-full min-h-96 w-full object-cover"
           />

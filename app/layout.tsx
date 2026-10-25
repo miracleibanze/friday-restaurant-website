@@ -4,56 +4,70 @@ import "./globals.css";
 
 const siteUrl = "https://friday-restaurant-website.vercel.app";
 
+const siteTitle = "Friday Restaurant | Chicken, Fish & Burgers in Kigali";
+
+const siteDescription =
+  "Order whole chicken, half chicken, chicken wings, chicken legs, chicken burgers, beef burgers, and whole fish at Friday Restaurant in Kigali, Rwanda. Explore our menu and order online.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+
   title: {
-    default: "Friday Restaurant | Whole Chicken & Fish in Kigali",
+    default: siteTitle,
     template: "%s | Friday Restaurant",
   },
-  description:
-    "Enjoy delicious whole chicken and fresh fish at Friday Restaurant in Kigali, Rwanda. Explore our menu, check prices, and order your favourite meal online.",
+
+  description: siteDescription,
+
   applicationName: "Friday Restaurant",
+
   keywords: [
     "Friday Restaurant",
     "restaurant in Kigali",
+    "chicken restaurant Kigali",
     "whole chicken Kigali",
-    "roast chicken Kigali",
-    "grilled chicken Kigali",
-    "fresh fish Kigali",
+    "half chicken Kigali",
+    "chicken wings Kigali",
+    "chicken legs Kigali",
+    "chicken burger Kigali",
+    "beef burger Kigali",
     "fish restaurant Kigali",
+    "whole fish Kigali",
     "chicken and fish Rwanda",
-    "order chicken online Kigali",
-    "order fish online Kigali",
+    "burgers in Kigali",
+    "order food online Kigali",
     "food delivery Kigali",
     "Kigali restaurant menu",
-    "Rwanda restaurants",
+    "restaurants in Rwanda",
   ],
+
   authors: [{ name: "Friday Restaurant" }],
   creator: "Friday Restaurant",
+
   openGraph: {
     type: "website",
     url: siteUrl,
     siteName: "Friday Restaurant",
     locale: "en_RW",
-    title: "Friday Restaurant | Whole Chicken & Fish in Kigali",
-    description:
-      "Looking for whole chicken or fish in Kigali? Discover Friday Restaurant, explore our menu, and order your favourite meal online.",
+    title: siteTitle,
+    description: siteDescription,
     images: [
       {
-        url: "public/logo2.png",
+        url: "/logo2.png",
         width: 1200,
         height: 630,
-        alt: "Whole chicken and fish at Friday Restaurant in Kigali",
+        alt: "Friday Restaurant — chicken, fish, and burgers in Kigali",
       },
     ],
   },
+
   twitter: {
     card: "summary_large_image",
-    title: "Friday Restaurant | Whole Chicken & Fish in Kigali",
-    description:
-      "Enjoy whole chicken and fish in Kigali, Rwanda. Explore the Friday Restaurant menu and order online.",
-    images: ["public/logo2.png"],
+    title: siteTitle,
+    description: siteDescription,
+    images: ["/logo2.png"],
   },
+
   robots: {
     index: true,
     follow: true,
