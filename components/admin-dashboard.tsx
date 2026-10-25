@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import { StoreHeader } from "@/components/storefront-ui";
+import AdminFeatures from "@/components/admin-features";
 
 type OrderStatus =
   | "confirmed"
@@ -34,6 +35,8 @@ type Order = {
   deliveryFee: number;
   total: number;
   paymentMethod: string;
+  paymentStatus: "pending" | "paid" | "failed";
+  paymentReference: string;
   status: OrderStatus;
   createdAt: string;
 };
@@ -85,6 +88,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState("");
+  const [activeSection, setActiveSection] = useState<
+    "orders" | "menu" | "payments" | "inbox" | "reports" | "customers"
+  >("orders");
   const ordersRequest = useRef<AbortController | null>(null);
   const allOrdersTotal = Object.values(counts).reduce(
     (sum, count) => sum + count,
@@ -211,6 +217,41 @@ export default function AdminDashboard() {
     }
   }
 
+  async function changePayment(
+    order: Order,
+    paymentStatus: Order["paymentStatus"],
+    paymentReference: string,
+  ) {
+    setUpdatingId(order.id);
+    setPageError("");
+    try {
+      const result = await readJson(
+        await fetch("/api/admin/orders", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: order.id,
+            paymentStatus,
+            paymentReference,
+          }),
+        }),
+      );
+      setOrders((current) =>
+        current.map((item) => (item.id === order.id ? result.order : item)),
+      );
+      setSelected((current) =>
+        current?.id === order.id ? result.order : current,
+      );
+      void loadOrders();
+    } catch (error) {
+      setPageError(
+        error instanceof Error ? error.message : "Could not update payment.",
+      );
+    } finally {
+      setUpdatingId("");
+    }
+  }
+
   async function logout() {
     await fetch("/api/auth", { method: "DELETE" });
     setIsAdmin(false);
@@ -299,7 +340,7 @@ export default function AdminDashboard() {
             <p className="text-2xl font-bold uppercase text-friday">
               Friday Restaurant
             </p>
-            <h1 className="font-display mt-1">Order dashboard</h1>
+            <h1 className="font-display mt-1">Admin dashboard</h1>
           </div>
           <div className="flex gap-2 ml-auto flex-wrap items-center justify-end sm:gap-3">
             <button
@@ -323,6 +364,27 @@ export default function AdminDashboard() {
       </header>
 
       <div className="mx-auto max-w-7xl px-5 py-8">
+        <nav aria-label="Admin sections" className="mb-7 flex gap-2 overflow-x-auto pb-1">
+          {([
+            ["orders", "Orders"],
+            ["menu", "Menu"],
+            ["payments", "Payments"],
+            ["inbox", "Support inbox"],
+            ["reports", "Sales reports"],
+            ["customers", "Customers"],
+          ] as const).map(([section, label]) => (
+            <button
+              key={section}
+              type="button"
+              onClick={() => setActiveSection(section)}
+              className={`shrink-0 rounded-full px-4 py-2.5 text-sm font-bold ${activeSection === section ? "bg-charcoal text-white" : "bg-white text-stone-600 hover:bg-stone-100"}`}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+        {activeSection === "orders" ? (
+          <>
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Metric
             title="All orders"
@@ -544,14 +606,22 @@ export default function AdminDashboard() {
             </div>
           </div>
         </section>
+          </>
+        ) : (
+          <AdminFeatures section={activeSection} />
+        )}
       </div>
 
       {selected && (
         <OrderModal
+          key={selected.id}
           order={selected}
           updating={updatingId === selected.id}
           onClose={() => setSelected(null)}
           onStatus={(status) => void changeStatus(selected, status)}
+          onPayment={(status, reference) =>
+            void changePayment(selected, status, reference)
+          }
         />
       )}
     </main>
@@ -599,12 +669,20 @@ function OrderModal({
   updating,
   onClose,
   onStatus,
+  onPayment,
 }: {
   order: Order;
   updating: boolean;
   onClose: () => void;
   onStatus: (status: OrderStatus) => void;
+  onPayment: (
+    status: Order["paymentStatus"],
+    reference: string,
+  ) => void;
 }) {
+  const [paymentReference, setPaymentReference] = useState(
+    order.paymentReference ?? "",
+  );
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-5"
@@ -707,6 +785,48 @@ function OrderModal({
               ))}
             </select>
           </label>
+        </div>
+        <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-stone-200 p-4 sm:flex-row sm:items-end">
+          <label className="flex-1 text-sm font-semibold">
+            Payment status
+            <select
+              value={order.paymentStatus ?? "pending"}
+              disabled={updating}
+              onChange={(event) =>
+                onPayment(
+                  event.target.value as Order["paymentStatus"],
+                  paymentReference,
+                )
+              }
+              className="mt-2 w-full rounded-xl border border-stone-200 bg-white px-3 py-2"
+            >
+              {(["pending", "paid", "failed"] as const).map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex-1 text-sm font-semibold">
+            Payment reference
+            <input
+              value={paymentReference}
+              maxLength={100}
+              onChange={(event) => setPaymentReference(event.target.value)}
+              className="mt-2 w-full rounded-xl border border-stone-200 px-3 py-2"
+              placeholder="Receipt or transaction ID"
+            />
+          </label>
+          <button
+            type="button"
+            disabled={updating}
+            onClick={() =>
+              onPayment(order.paymentStatus ?? "pending", paymentReference)
+            }
+            className="rounded-full bg-charcoal px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50"
+          >
+            Save reference
+          </button>
         </div>
       </section>
     </div>

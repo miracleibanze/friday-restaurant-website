@@ -51,7 +51,6 @@ export async function POST(request: NextRequest) {
         !constantTimeEqual(email, adminEmail) ||
         !constantTimeEqual(password, adminPassword)
       ) {
-        console.log({ email, password, adminEmail, adminPassword })
         return NextResponse.json({ error: "Invalid administrator credentials." }, { status: 401 });
       }
       const response = NextResponse.json({ user: publicAdmin() });

@@ -133,6 +133,13 @@ const appSlice = createSlice({
       if (item) item.quantity += quantity;
       else state.cart.push({ food: action.payload.food, quantity });
     },
+    syncMenu(state, action: PayloadAction<Food[]>) {
+      const catalog = new Map(action.payload.map((food) => [food.id, food]));
+      state.cart = state.cart.map((item) => ({
+        ...item,
+        food: catalog.get(item.food.id) ?? item.food,
+      }));
+    },
     updateCartItem(
       state,
       action: PayloadAction<{ id: string; quantity: number }>,
@@ -216,6 +223,7 @@ export const {
   setOrders,
   setOrdersError,
   addToCart,
+  syncMenu,
   updateCartItem,
   removeFromCart,
   completeOrder,

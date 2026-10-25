@@ -2,7 +2,7 @@ import { isValidObjectId } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { serializeOrder } from "@/lib/api-serializers";
-import { Order, orderStatuses } from "@/lib/models/order";
+import { Order, orderStatuses, paymentStatuses } from "@/lib/models/order";
 import { getSession } from "@/lib/session";
 
 async function requireAdmin(request: NextRequest) {
@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
     await connectToDatabase();
     const params = request.nextUrl.searchParams;
     const status = params.get("status") ?? "all";
+    const paymentStatus = params.get("paymentStatus") ?? "all";
     const search = params.get("search")?.trim().slice(0, 100) ?? "";
     const requestedPage = Number(params.get("page") ?? 1);
     const pageSize = Number(params.get("pageSize") ?? 20);
@@ -31,14 +32,25 @@ export async function GET(request: NextRequest) {
     if (status !== "all" && orderStatuses.includes(status as (typeof orderStatuses)[number])) {
       filter.status = status;
     }
+    if (paymentStatus !== "all" && paymentStatus === "pending") {
+      filter.$or = [{ paymentStatus: "pending" }, { paymentStatus: { $exists: false } }];
+    } else if (paymentStatus !== "all" && ["paid", "failed"].includes(paymentStatus)) {
+      filter.paymentStatus = paymentStatus;
+    }
     if (search) {
       const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      filter.$or = [
+      const searchConditions = [
         { orderNumber: { $regex: escaped, $options: "i" } },
         { customerName: { $regex: escaped, $options: "i" } },
         { email: { $regex: escaped, $options: "i" } },
         { phone: { $regex: escaped, $options: "i" } },
       ];
+      if (filter.$or) {
+        filter.$and = [{ $or: filter.$or }, { $or: searchConditions }];
+        delete filter.$or;
+      } else {
+        filter.$or = searchConditions;
+      }
     }
 
     const [total, statusCounts] = await Promise.all([
@@ -78,13 +90,31 @@ export async function PATCH(request: NextRequest) {
     if (typeof body.id !== "string" || !isValidObjectId(body.id)) {
       return NextResponse.json({ error: "A valid order id is required." }, { status: 400 });
     }
-    if (!orderStatuses.includes(body.status)) {
-      return NextResponse.json({ error: "Select a valid order status." }, { status: 400 });
+    const updates: Record<string, string> = {};
+    if (body.status !== undefined) {
+      if (!orderStatuses.includes(body.status)) {
+        return NextResponse.json({ error: "Select a valid order status." }, { status: 400 });
+      }
+      updates.status = body.status;
+    }
+    if (body.paymentStatus !== undefined) {
+      if (!paymentStatuses.includes(body.paymentStatus)) {
+        return NextResponse.json({ error: "Select a valid payment status." }, { status: 400 });
+      }
+      updates.paymentStatus = body.paymentStatus;
+      const reference = typeof body.paymentReference === "string" ? body.paymentReference.trim() : "";
+      if (reference.length > 100) {
+        return NextResponse.json({ error: "Payment reference must be 100 characters or fewer." }, { status: 400 });
+      }
+      updates.paymentReference = reference;
+    }
+    if (!Object.keys(updates).length) {
+      return NextResponse.json({ error: "Provide an order or payment status to update." }, { status: 400 });
     }
     await connectToDatabase();
     const order = await Order.findByIdAndUpdate(
       body.id,
-      { $set: { status: body.status } },
+      { $set: updates },
       { new: true, runValidators: true },
     );
     if (!order) return NextResponse.json({ error: "Order not found." }, { status: 404 });

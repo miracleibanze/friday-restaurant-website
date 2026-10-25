@@ -31,6 +31,8 @@ export function serializeOrder(order: OrderDocument) {
     deliveryFee: order.deliveryFee,
     total: order.total,
     paymentMethod: order.paymentMethod,
+    paymentStatus: order.paymentStatus ?? "pending",
+    paymentReference: order.paymentReference ?? "",
     status: order.status,
     notes: order.notes,
     createdAt: order.createdAt.toISOString(),

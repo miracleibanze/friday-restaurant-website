@@ -17,6 +17,7 @@ import {
   Star,
   UtensilsCrossed,
   X,
+  ExternalLink,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { addToCart, type Order } from "@/lib/store/store";
@@ -27,7 +28,7 @@ import Image from "next/image";
 export const money = (value: number) =>
   `${new Intl.NumberFormat("en-RW").format(value)} RWF`;
 export const inputClass =
-  "w-full rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-sm outline-none transition placeholder:text-stone-400 focus:border-friday focus:ring-4 focus:ring-orange-100";
+  "w-full rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-sm outline-none transition placeholder:text-stone-300 focus:border-friday focus:ring-4 focus:ring-orange-100";
 export const buttonClass =
   "inline-flex items-center justify-center gap-2 rounded-full bg-friday px-6 py-3.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-friday-dark disabled:cursor-not-allowed disabled:opacity-50";
 export function PageLoader({ label }: { label: string }) {
@@ -236,7 +237,7 @@ export function StoreFooter() {
       <div className="shell grid gap-12 py-16 md:grid-cols-2 lg:grid-cols-4">
         <div>
           <Logo />
-          <p className="mt-5 max-w-xs text-sm leading-7 text-stone-400">
+          <p className="mt-5 max-w-xs text-sm leading-7 text-stone-300">
             Good food, good mood. Made fresh in Kigali and delivered with care.
           </p>
           <div className="mt-5 flex gap-3">
@@ -250,7 +251,7 @@ export function StoreFooter() {
         </div>
         <div>
           <p className="font-display text-lg">Explore</p>
-          <div className="mt-5 flex flex-col gap-3 text-sm text-stone-400">
+          <div className="mt-5 flex flex-col gap-3 text-sm text-stone-300">
             <Link href="/#products">Our Meals</Link>
             <Link href="/order-tracking">Track an order</Link>
             <Link href="/faq">FAQs</Link>
@@ -258,7 +259,7 @@ export function StoreFooter() {
         </div>
         <div>
           <p className="font-display text-lg">Legal</p>
-          <div className="mt-5 flex flex-col gap-3 text-sm text-stone-400">
+          <div className="mt-5 flex flex-col gap-3 text-sm text-stone-300">
             <Link href="/privacy-policy">Privacy policy</Link>
             <Link href="/terms">Terms of service</Link>
             <Link href="/contact">Contact us</Link>
@@ -266,7 +267,7 @@ export function StoreFooter() {
         </div>
         <div>
           <p className="font-display text-lg">Visit Friday</p>
-          <div className="mt-5 space-y-3 text-sm text-stone-400">
+          <div className="mt-5 space-y-3 text-sm text-stone-300">
             <p className="flex gap-3">
               <MapPin size={18} className="text-friday" /> KG 7 Ave, Kigali,
               Rwanda
@@ -280,8 +281,25 @@ export function StoreFooter() {
           </div>
         </div>
       </div>
-      <div className="border-t border-white/10 py-6 text-center text-xs text-stone-500">
-        © {new Date().getFullYear()} Friday Restaurant. Made in Kigali.
+      <div className="border-t border-white/10 py-6 text-center text-xs text-stone-300 flex justify-center items-center flex-wrap gap-2">
+        <span className="text-center">
+          © {new Date().getFullYear()} Friday Restaurant. All rights reserved.
+        </span>
+        <span className="text-center">Made in Kigali.</span>
+      </div>
+      <div className="mt-6 border-t border-stone-200/70 pt-2 pb-6 text-center">
+        <p className="text-xs text-stone-300">
+          Website by{" "}
+          <a
+            href="https://ibanze-miracle.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-stone-300 transition hover:text-amber-100 inline-flex items-center justify-center"
+          >
+            IBANZE Miracle{" "}
+            <ExternalLink size={12} className="inline-block ml-1" />
+          </a>
+        </p>
       </div>
     </footer>
   );
@@ -434,11 +452,11 @@ export function OrderSummary({
     <aside className="h-fit rounded-3xl bg-charcoal p-7 text-white">
       <h2 className="font-display text-2xl font-light">Order summary</h2>
       <div className="mt-6 space-y-4 border-b border-white/10 pb-6 text-sm">
-        <div className="flex justify-between text-stone-400">
+        <div className="flex justify-between text-stone-300">
           <span>Subtotal</span>
           <span className="text-white">{money(subtotal)}</span>
         </div>
-        <div className="flex justify-between text-stone-400">
+        <div className="flex justify-between text-stone-300">
           <span>Delivery</span>
           <span className="text-white">
             {delivery ? money(delivery) : "Free"}
@@ -516,19 +534,19 @@ export function ConfirmedOrder({ order }: { order: Order | null }) {
         </p>
         <div className="mt-8 grid gap-3 rounded-3xl bg-stone-50 p-5 text-left sm:grid-cols-2">
           <div>
-            <p className="text-xs text-stone-400">Order number</p>
+            <p className="text-xs text-stone-300">Order number</p>
             <p className="mt-1 font-bold">{order.orderNumber}</p>
           </div>
           <div>
-            <p className="text-xs text-stone-400">Estimated delivery</p>
+            <p className="text-xs text-stone-300">Estimated delivery</p>
             <p className="mt-1 font-bold">35–45 minutes</p>
           </div>
           <div>
-            <p className="text-xs text-stone-400">Total</p>
+            <p className="text-xs text-stone-300">Total</p>
             <p className="mt-1 font-bold">{money(order.total)}</p>
           </div>
           <div>
-            <p className="text-xs text-stone-400">Payment</p>
+            <p className="text-xs text-stone-300">Payment</p>
             <p className="mt-1 font-bold capitalize">
               {order.paymentMethod.replace("-", " ")}
             </p>

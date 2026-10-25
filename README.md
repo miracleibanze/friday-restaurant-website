@@ -44,9 +44,16 @@ All APIs are implemented as Next.js Route Handlers under `app/api`:
 - `GET /api/orders` — list the signed-in customer's orders.
 - `GET /api/orders?orderNumber=FR-...` — public order status lookup (does not disclose delivery address or customer contact details).
 - `GET /api/admin/orders` — admin-only paginated order list. Supports `status`, `search`, `page` (1-based), and `pageSize` (`10`, `20`, `50`, or `100`) query parameters. Returns the filtered `total`, current `page`, `pageSize`, and `pages` alongside the orders; status counts remain global.
-- `PATCH /api/admin/orders` — admin-only order status update with `{ "id": "...", "status": "confirmed" | "preparing" | "on-the-way" | "delivered" | "cancelled" }`.
+- `PATCH /api/admin/orders` — admin-only order status update or manual payment reconciliation with `{ "id": "...", "status": "..." }` or `{ "id": "...", "paymentStatus": "pending" | "paid" | "failed", "paymentReference": "..." }`.
+- `GET /api/menu` — public menu catalog used by the storefront and checkout.
+- `GET /api/admin/menu` — admin-only menu listing.
+- `POST`, `PATCH`, and `DELETE /api/admin/menu` — admin-only menu item create/update/disable operations. Disable is non-destructive; old order items retain their saved names and prices.
+- `POST /api/contact` — save a customer message to the support inbox.
+- `GET` and `PATCH /api/admin/messages` — admin-only customer message inbox and status management.
+- `GET /api/admin/reports?days=7|30|90` — admin-only paid-revenue, order, payment, and best-seller report.
+- `GET /api/admin/customers` — admin-only registered customer list with order summaries; supports `search` and `page`.
 
-The admin dashboard is at `/admin`. It polls for new orders every 15 seconds and can search, filter, inspect, and update orders.
+The admin dashboard is at `/admin`. It polls for new orders every 15 seconds and can search, filter, inspect, and update orders. It also supports menu management, manual payment reconciliation, contact-message management, sales reports, and registered-customer summaries.
 
 Passwords are hashed server-side and login sessions use signed, `HttpOnly` cookies. Use HTTPS in production. Order prices and totals are recalculated from the server menu catalog; the browser's submitted prices are not trusted.
 
@@ -54,5 +61,6 @@ Passwords are hashed server-side and login sessions use signed, `HttpOnly` cooki
 
 - Checkout records the selected payment method but does not charge cards or initiate mobile-money payments.
 - Password reset email delivery is not configured.
-- Contact form messages are kept in the submitting browser; configure a mail or database service before using it as a customer support inbox.
-- Menu content is currently defined in `lib/menu-data.ts`; MongoDB stores users and orders.
+- Payment collection is not integrated. Payment statuses (`pending`, `paid`, and `failed`) and references are recorded manually by an administrator; card and mobile-money charges are not initiated.
+- The initial menu catalog comes from `lib/menu-data.ts` and is copied into MongoDB the first time the menu API is used. Admin menu changes are then stored in MongoDB.
+- Contact submissions are stored in MongoDB. Replies are initiated through the admin's email application; outbound email delivery is not configured.

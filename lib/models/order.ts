@@ -16,6 +16,8 @@ export const orderStatuses = [
 ] as const;
 
 export type OrderStatus = (typeof orderStatuses)[number];
+export const paymentStatuses = ["pending", "paid", "failed"] as const;
+export type PaymentStatus = (typeof paymentStatuses)[number];
 
 export interface OrderItemFields {
   food: string;
@@ -36,6 +38,8 @@ export interface OrderFields {
   deliveryFee: number;
   total: number;
   paymentMethod: "mobile-money" | "card" | "cash";
+  paymentStatus: PaymentStatus;
+  paymentReference: string;
   status: OrderStatus;
   notes: string;
   createdAt: Date;
@@ -68,6 +72,8 @@ const orderSchema = new Schema<OrderFields>(
       enum: ["mobile-money", "card", "cash"],
       required: true,
     },
+    paymentStatus: { type: String, enum: paymentStatuses, default: "pending", index: true },
+    paymentReference: { type: String, trim: true, maxlength: 100, default: "" },
     status: { type: String, enum: orderStatuses, default: "confirmed", index: true },
     notes: { type: String, trim: true, maxlength: 500, default: "" },
   },

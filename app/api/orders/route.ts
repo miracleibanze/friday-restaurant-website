@@ -1,8 +1,8 @@
 import { randomBytes } from "node:crypto";
 import { isValidObjectId } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
-import { menuFoods } from "@/lib/menu-data";
 import { connectToDatabase } from "@/lib/db";
+import { getMenuItems } from "@/lib/menu-catalog";
 import { serializeOrder } from "@/lib/api-serializers";
 import { Order } from "@/lib/models/order";
 import { User } from "@/lib/models/user";
@@ -56,13 +56,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Your order must include at least one menu item." }, { status: 400 });
     }
 
+    const menuItems = await getMenuItems();
     const requestedItems = body.items as Array<{ food?: unknown; quantity?: unknown }>;
     const items = [];
     for (const requested of requestedItems) {
       if (typeof requested.food !== "string" || !Number.isInteger(requested.quantity) || Number(requested.quantity) < 1 || Number(requested.quantity) > 20) {
         return NextResponse.json({ error: "One or more order quantities are invalid." }, { status: 400 });
       }
-      const food = menuFoods.find((menuItem) => menuItem.id === requested.food && menuItem.available);
+      const food = menuItems.find((menuItem) => menuItem.id === requested.food && menuItem.available);
       if (!food) return NextResponse.json({ error: "One or more selected menu items are unavailable." }, { status: 400 });
       items.push({ food: food.id, name: food.name, price: food.price, quantity: Number(requested.quantity) });
     }

@@ -12,22 +12,23 @@ import { useState, type FormEvent } from "react";
 export default function ContactPage() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    const form = event.currentTarget;
+    const fields = Object.fromEntries(new FormData(form));
     try {
-      const messages = JSON.parse(
-        localStorage.getItem("friday-contact-messages") || "[]",
-      );
-      messages.push({
-        ...Object.fromEntries(new FormData(event.currentTarget)),
-        createdAt: new Date().toISOString(),
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fields),
       });
-      localStorage.setItem("friday-contact-messages", JSON.stringify(messages));
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Could not send message.");
       setSent(true);
-      event.currentTarget.reset();
-    } catch {
-      setError("We could not save your message. Please try again.");
+      form.reset();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "We could not save your message. Please try again.");
     }
   }
   return (
@@ -80,7 +81,7 @@ export default function ContactPage() {
           </div>
           {sent && (
             <p className="mt-5 rounded-2xl bg-green-50 p-4 text-sm font-bold text-green-700">
-              Thanks! Your message has been saved in this browser.
+              Thanks! Your message has been sent to Friday Restaurant.
             </p>
           )}
           {error && (
@@ -89,7 +90,7 @@ export default function ContactPage() {
             </p>
           )}
           <button className={`${buttonClass} mt-6`}>
-            Save message <ArrowRight size={17} />
+            Send message <ArrowRight size={17} />
           </button>
         </form>
       </div>

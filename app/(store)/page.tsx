@@ -11,9 +11,26 @@ import { menuFoods } from "@/lib/menu-data";
 import { ArrowRight, Clock3, Phone, Star, WavesVertical } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import type { Food } from "@/lib/menu-data";
 
 export default function HomePage() {
   const add = useAddFood();
+  const [foods, setFoods] = useState<Food[]>(menuFoods);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/menu", { signal: controller.signal })
+      .then(async (response) => {
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Could not load menu.");
+        setFoods(result.items);
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        console.error("Could not refresh storefront menu.", error);
+      });
+    return () => controller.abort();
+  }, []);
   return (
     <>
       <section className="relative overflow-hidden bg-opacity-gradient md:bg-gradient pb-8">
@@ -82,7 +99,7 @@ export default function HomePage() {
             text="Made fresh when you order, with generous portions and ingredients we’re proud of."
           />
           <div className="flex flex-wrap gap-5 flex-column lg:flex-row max-lg:items-center">
-            {menuFoods.map((food) => (
+            {foods.map((food) => (
               <FoodCard key={food.id} food={food} add={add} />
             ))}
           </div>
@@ -112,7 +129,7 @@ export default function HomePage() {
             </p>
             <Link
               href="/contact"
-              className="mt-8 inline-flex items-center gap-2 font-bold bg-friday px-6 py-3.5 text-sm transition hover:bg-friday/90 rounded-full w-max-content"
+              className="mt-8 inline-flex items-center gap-2 font-bold bg-friday px-6 py-3.5 text-sm transition hover:bg-friday/90 rounded-full w-full sm:max-w-max"
             >
               Come say hello <ArrowRight size={17} />
             </Link>

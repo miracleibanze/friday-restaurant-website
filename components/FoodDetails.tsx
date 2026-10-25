@@ -10,16 +10,37 @@ import { menuFoods } from "@/lib/menu-data";
 import { Check, Clock3, Minus, Plus, Star } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { useEffect } from "react";
+import type { Food } from "@/lib/menu-data";
+import { PageLoader } from "@/components/storefront-ui";
 
 interface FoodDetailsProps {
   slug: string;
 }
 
 export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
-  // Gushaka ifunguro rishyanye na slug
-  const food = menuFoods.find((item) => item.slug === slug);
+  const [food, setFood] = useState<Food | null>(
+    () => menuFoods.find((item) => item.slug === slug) ?? null,
+  );
+  const [loading, setLoading] = useState(true);
   const add = useAddFood();
   const [quantity, setQuantity] = useState(1);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/menu", { signal: controller.signal })
+      .then(async (response) => {
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Could not load menu.");
+        setFood(result.items.find((item: Food) => item.slug === slug) ?? null);
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        console.error("Could not load menu item.", error);
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [slug]);
+  if (loading) return <PageLoader label="Loading menu item…" />;
   if (!food)
     return (
       <EmptyState
@@ -92,13 +113,16 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
             <button
               type="button"
               onClick={() => add(food, quantity)}
+              disabled={!food.available}
               className={`${buttonClass} flex-1`}
             >
-              Add to bag · {money(food.price * quantity)}
+              {food.available
+                ? `Add to bag · ${money(food.price * quantity)}`
+                : "Currently unavailable"}
             </button>
           </div>
           <p className="mt-5 flex items-center gap-2 text-sm font-semibold text-sage">
-            <Check size={17} /> Available today
+            <Check size={17} /> {food.available ? "Available today" : "Unavailable today"}
           </p>
         </div>
       </div>
