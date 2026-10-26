@@ -277,14 +277,14 @@ export function StoreFooter() {
               <Phone size={18} className="text-friday" /> +250 782 723 621
             </a>
             <a
-                href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent("pascaluwimana1@gmail.com")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex gap-3"
-              >
-                
-                <Mail size={18} className="text-friday" /> pascaluwimana1@gmail.com
-              </a>
+              href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent("pascaluwimana1@gmail.com")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex gap-3"
+            >
+              <Mail size={18} className="text-friday" />{" "}
+              pascaluwimana1@gmail.com
+            </a>
             <p className="flex gap-3">
               <Clock3 size={18} className="text-friday" /> Daily, 10:00–22:30
             </p>
@@ -295,7 +295,9 @@ export function StoreFooter() {
         <span className="text-center">
           © {new Date().getFullYear()} Friday Restaurant. All rights reserved.
         </span>
-        <span className="text-center">Made in Kigali.</span>
+        <Link href="/admin" className="text-center cursor-pointer">
+          Made in Kigali.
+        </Link>
       </div>
       <div className="mt-6 border-t border-stone-200/70 pt-2 pb-6 text-center">
         <p className="text-xs text-stone-300">
