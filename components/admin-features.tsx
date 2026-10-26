@@ -290,6 +290,7 @@ function MenuManagement() {
                   className={`${inputClass} mt-1`}
                   value={form.image}
                   required
+                  disabled={true}
                   maxLength={1000}
                   placeholder="/dish.jpg"
                   onChange={(event) =>
