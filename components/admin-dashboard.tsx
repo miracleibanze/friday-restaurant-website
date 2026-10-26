@@ -337,7 +337,7 @@ export default function AdminDashboard() {
       <header className="border-b border-stone-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-5 py-2 flex-wrap sm:gap-4 sm:px-8 lg:flex-nowrap">
           <div>
-            <p className="text-2xl font-bold uppercase text-friday">
+            <p className="text-2xl font-head uppercase text-friday">
               Friday Restaurant
             </p>
             <h1 className="font-display mt-1">Admin dashboard</h1>
@@ -364,20 +364,25 @@ export default function AdminDashboard() {
       </header>
 
       <div className="mx-auto max-w-7xl px-5 py-8">
-        <nav aria-label="Admin sections" className="mb-7 flex gap-2 overflow-x-auto pb-1">
-          {([
-            ["orders", "Orders"],
-            ["menu", "Menu"],
-            ["payments", "Payments"],
-            ["inbox", "Support inbox"],
-            ["reports", "Sales reports"],
-            ["customers", "Customers"],
-          ] as const).map(([section, label]) => (
+        <nav
+          aria-label="Admin sections"
+          className="mb-7 flex gap-2 overflow-x-auto pb-1"
+        >
+          {(
+            [
+              ["orders", "Orders"],
+              ["menu", "Menu"],
+              ["payments", "Payments"],
+              ["inbox", "Support inbox"],
+              ["reports", "Sales reports"],
+              ["customers", "Customers"],
+            ] as const
+          ).map(([section, label]) => (
             <button
               key={section}
               type="button"
               onClick={() => setActiveSection(section)}
-              className={`shrink-0 rounded-full px-4 py-2.5 text-sm font-bold ${activeSection === section ? "bg-charcoal text-white" : "bg-white text-stone-600 hover:bg-stone-100"}`}
+              className={`shrink-0 rounded-full px-4 py-2.5 text-sm font-bold ${activeSection === section ? "bg-friday text-white" : "bg-white text-stone-600 border border-stone-400 hover:bg-stone-100"}`}
             >
               {label}
             </button>
@@ -385,227 +390,231 @@ export default function AdminDashboard() {
         </nav>
         {activeSection === "orders" ? (
           <>
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric
-            title="All orders"
-            value={allOrdersTotal}
-            icon={<ShoppingBag size={18} />}
-          />
-          <Metric
-            title="New requests"
-            value={counts.confirmed || 0}
-            icon={<Clock3 size={18} />}
-          />
-          <Metric
-            title="Preparing"
-            value={counts.preparing || 0}
-            icon={<RefreshCw size={18} />}
-          />
-          <Metric
-            title="On the way"
-            value={counts["on-the-way"] || 0}
-            icon={<ArrowDownToLine size={18} />}
-          />
-        </section>
+            <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <Metric
+                title="All orders"
+                value={allOrdersTotal}
+                icon={<ShoppingBag size={18} />}
+              />
+              <Metric
+                title="New requests"
+                value={counts.confirmed || 0}
+                icon={<Clock3 size={18} />}
+              />
+              <Metric
+                title="Preparing"
+                value={counts.preparing || 0}
+                icon={<RefreshCw size={18} />}
+              />
+              <Metric
+                title="On the way"
+                value={counts["on-the-way"] || 0}
+                icon={<ArrowDownToLine size={18} />}
+              />
+            </section>
 
-        <section className="mt-8 rounded-3xl bg-white p-5 shadow-sm sm:p-7">
-          <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
-            <div>
-              <h2 className="font-display text-2xl">Customer orders</h2>
-              <p className="mt-1 text-sm text-stone-500">
-                New requests appear automatically every 15 seconds.
-              </p>
-            </div>
-            <form
-              onSubmit={(event) => {
-                event.preventDefault();
-                setPage(1);
-                setAppliedSearch(search.trim());
-              }}
-              className="flex w-full gap-2 lg:max-w-xl"
-            >
-              <label className="relative flex-1">
-                <Search
-                  size={17}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400"
-                />
-                <input
-                  className={`${inputClass} pl-10`}
-                  placeholder="Order number, customer or email"
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                />
-              </label>
-              <button className="rounded-xl bg-charcoal px-5 text-sm font-bold text-white hover:bg-friday">
-                Search
-              </button>
-            </form>
-          </div>
-          <div className="mt-6 flex gap-2 overflow-x-auto pb-1">
-            {["all", ...statuses].map((status) => (
-              <button
-                key={status}
-                type="button"
-                onClick={() => {
-                  setPage(1);
-                  setFilter(status);
-                }}
-                className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold ${filter === status ? "bg-charcoal text-white" : "bg-stone-100 text-stone-600 hover:bg-stone-200"}`}
-              >
-                {status === "all" ? "All" : statusLabels[status as OrderStatus]}{" "}
-                <span className="ml-1 opacity-70">
-                  {status === "all" ? allOrdersTotal : counts[status] || 0}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          {pageError && (
-            <p
-              role="alert"
-              className="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-700"
-            >
-              {pageError}
-            </p>
-          )}
-          {loading && !orders.length ? (
-            <p className="py-16 text-center text-sm text-stone-500">
-              Loading orders…
-            </p>
-          ) : orders.length ? (
-            <div className="mt-5 divide-y divide-stone-100">
-              {orders.map((order) => (
-                <article
-                  key={order.id}
-                  className="flex flex-col gap-4 border-b border-stone-200 py-5 last:border-b-0 md:flex-row md:items-center hover:bg-stone-50"
+            <section className="mt-8 rounded-3xl bg-white p-5 shadow-sm sm:p-7">
+              <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
+                <div>
+                  <h2 className="font-display text-2xl">Customer orders</h2>
+                  <p className="mt-1 text-sm text-stone-500">
+                    New requests appear automatically every 15 seconds.
+                  </p>
+                </div>
+                <form
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    setPage(1);
+                    setAppliedSearch(search.trim());
+                  }}
+                  className="flex w-full gap-2 lg:max-w-xl"
                 >
-                  <button
-                    type="button"
-                    onClick={() => setSelected(order)}
-                    className="min-w-0 flex-1 text-left cursor-pointer"
-                  >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-bold">{order.orderNumber}</span>
-                      <StatusPill status={order.status} />
-                    </div>
-
-                    <p className="mt-1 truncate text-sm text-stone-700">
-                      {order.customerName} · {order.email}
-                    </p>
-
-                    <p className="mt-1 text-xs text-stone-400">
-                      {new Date(order.createdAt).toLocaleString()} ·{" "}
-                      {order.items.length} item
-                      {order.items.length === 1 ? "" : "s"}
-                    </p>
-
-                    {order.notes?.trim() && (
-                      <div className="mt-3 rounded-xl bg-stone-200 px-3 py-2">
-                        <p className="text-xs font-semibold text-stone-500">
-                          Customer notes
-                        </p>
-                        <p className="mt-1 whitespace-pre-wrap break-words text-sm text-stone-700">
-                          {order.notes}
-                        </p>
-                      </div>
-                    )}
+                  <label className="relative flex-1">
+                    <Search
+                      size={17}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400"
+                    />
+                    <input
+                      className={`${inputClass} pl-10`}
+                      placeholder="Order number, customer or email"
+                      value={search}
+                      onChange={(event) => setSearch(event.target.value)}
+                    />
+                  </label>
+                  <button className="rounded-xl bg-friday px-5 text-sm font-bold text-white hover:bg-friday">
+                    Search
                   </button>
-
-                  <div className="flex flex-wrap items-center justify-between gap-3 md:justify-end">
-                    <span className="font-display text-lg">
-                      {money(order.total)}
+                </form>
+              </div>
+              <div className="mt-6 flex gap-2 overflow-x-auto pb-1">
+                {["all", ...statuses].map((status) => (
+                  <button
+                    key={status}
+                    type="button"
+                    onClick={() => {
+                      setPage(1);
+                      setFilter(status);
+                    }}
+                    className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold ${filter === status ? "bg-charcoal text-white" : "bg-stone-100 text-stone-600 hover:bg-stone-200"}`}
+                  >
+                    {status === "all"
+                      ? "All"
+                      : statusLabels[status as OrderStatus]}{" "}
+                    <span className="ml-1 opacity-70">
+                      {status === "all" ? allOrdersTotal : counts[status] || 0}
                     </span>
+                  </button>
+                ))}
+              </div>
 
-                    <div className="flex items-center gap-2">
-                      <select
-                        aria-label={`Update ${order.orderNumber} status`}
-                        className="max-w-40 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm font-semibold"
-                        value={order.status}
-                        disabled={updatingId === order.id}
-                        onChange={(event) =>
-                          void changeStatus(
-                            order,
-                            event.target.value as OrderStatus,
-                          )
-                        }
-                      >
-                        {statuses.map((status) => (
-                          <option key={status} value={status}>
-                            {statusLabels[status]}
-                          </option>
-                        ))}
-                      </select>
-
+              {pageError && (
+                <p
+                  role="alert"
+                  className="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-700"
+                >
+                  {pageError}
+                </p>
+              )}
+              {loading && !orders.length ? (
+                <p className="py-16 text-center text-sm text-stone-500">
+                  Loading orders…
+                </p>
+              ) : orders.length ? (
+                <div className="mt-5 divide-y divide-stone-100">
+                  {orders.map((order) => (
+                    <article
+                      key={order.id}
+                      className="flex flex-col gap-4 border-b border-stone-200 py-5 last:border-b-0 md:flex-row md:items-center hover:bg-stone-50"
+                    >
                       <button
                         type="button"
                         onClick={() => setSelected(order)}
-                        className="rounded-xl border border-stone-200 px-3 py-2 text-sm font-bold transition hover:bg-stone-50"
+                        className="min-w-0 flex-1 text-left cursor-pointer"
                       >
-                        Details
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-bold">{order.orderNumber}</span>
+                          <StatusPill status={order.status} />
+                        </div>
+
+                        <p className="mt-1 truncate text-sm text-stone-700">
+                          {order.customerName} · {order.email}
+                        </p>
+
+                        <p className="mt-1 text-xs text-stone-400">
+                          {new Date(order.createdAt).toLocaleString()} ·{" "}
+                          {order.items.length} item
+                          {order.items.length === 1 ? "" : "s"}
+                        </p>
+
+                        {order.notes?.trim() && (
+                          <div className="mt-3 rounded-xl bg-stone-200 px-3 py-2">
+                            <p className="text-xs font-semibold text-stone-500">
+                              Customer notes
+                            </p>
+                            <p className="mt-1 whitespace-pre-wrap break-words text-sm text-stone-700">
+                              {order.notes}
+                            </p>
+                          </div>
+                        )}
                       </button>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <p className="py-16 text-center text-sm text-stone-500">
-              No orders match this filter yet.
-            </p>
-          )}
-          <div className="mt-5 flex flex-col gap-4 border-t border-stone-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-stone-500">
-              {total
-                ? `Showing ${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, total)} of ${total} orders`
-                : "No orders to show"}
-            </p>
-            <div className="flex items-center justify-between gap-4 sm:justify-end">
-              <label className="flex items-center gap-2 text-sm text-stone-600">
-                Rows
-                <select
-                  aria-label="Orders per page"
-                  className="rounded-lg border border-stone-200 bg-white px-2.5 py-2 font-semibold"
-                  value={pageSize}
-                  onChange={(event) => {
-                    setPage(1);
-                    setPageSize(Number(event.target.value));
-                  }}
-                >
-                  {[10, 20, 50, 100].map((size) => (
-                    <option key={size} value={size}>
-                      {size}
-                    </option>
+
+                      <div className="flex flex-wrap items-center justify-between gap-3 md:justify-end">
+                        <span className="font-display text-lg">
+                          {money(order.total)}
+                        </span>
+
+                        <div className="flex items-center gap-2">
+                          <select
+                            aria-label={`Update ${order.orderNumber} status`}
+                            className="max-w-40 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm font-semibold"
+                            value={order.status}
+                            disabled={updatingId === order.id}
+                            onChange={(event) =>
+                              void changeStatus(
+                                order,
+                                event.target.value as OrderStatus,
+                              )
+                            }
+                          >
+                            {statuses.map((status) => (
+                              <option key={status} value={status}>
+                                {statusLabels[status]}
+                              </option>
+                            ))}
+                          </select>
+
+                          <button
+                            type="button"
+                            onClick={() => setSelected(order)}
+                            className="rounded-xl border border-sage px-3 py-2 text-sm font-bold bg-sage text-white transition hover:scale-105"
+                          >
+                            Details
+                          </button>
+                        </div>
+                      </div>
+                    </article>
                   ))}
-                </select>
-              </label>
-              <div className="flex items-center gap-2">
-                <span className="min-w-16 text-center text-sm text-stone-500">
-                  {pages ? `${page} / ${pages}` : "0 / 0"}
-                </span>
-                <button
-                  type="button"
-                  aria-label="Previous page"
-                  disabled={page <= 1 || loading}
-                  onClick={() => setPage((current) => Math.max(1, current - 1))}
-                  className="rounded-lg border border-stone-200 p-2 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Next page"
-                  disabled={!pages || page >= pages || loading}
-                  onClick={() =>
-                    setPage((current) => Math.min(pages, current + 1))
-                  }
-                  className="rounded-lg border border-stone-200 p-2 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <ChevronRight size={18} />
-                </button>
+                </div>
+              ) : (
+                <p className="py-16 text-center text-sm text-stone-500">
+                  No orders match this filter yet.
+                </p>
+              )}
+              <div className="mt-5 flex flex-col gap-4 border-t border-stone-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-stone-500">
+                  {total
+                    ? `Showing ${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, total)} of ${total} orders`
+                    : "No orders to show"}
+                </p>
+                <div className="flex items-center justify-between gap-4 sm:justify-end">
+                  <label className="flex items-center gap-2 text-sm text-stone-600">
+                    Rows
+                    <select
+                      aria-label="Orders per page"
+                      className="rounded-lg border border-stone-200 bg-white px-2.5 py-2 font-semibold"
+                      value={pageSize}
+                      onChange={(event) => {
+                        setPage(1);
+                        setPageSize(Number(event.target.value));
+                      }}
+                    >
+                      {[10, 20, 50, 100].map((size) => (
+                        <option key={size} value={size}>
+                          {size}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <span className="min-w-16 text-center text-sm text-stone-500">
+                      {pages ? `${page} / ${pages}` : "0 / 0"}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label="Previous page"
+                      disabled={page <= 1 || loading}
+                      onClick={() =>
+                        setPage((current) => Math.max(1, current - 1))
+                      }
+                      className="rounded-lg border border-stone-200 p-2 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <ChevronLeft size={18} />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Next page"
+                      disabled={!pages || page >= pages || loading}
+                      onClick={() =>
+                        setPage((current) => Math.min(pages, current + 1))
+                      }
+                      className="rounded-lg border border-stone-200 p-2 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <ChevronRight size={18} />
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </section>
+            </section>
           </>
         ) : (
           <AdminFeatures section={activeSection} />
@@ -675,10 +684,7 @@ function OrderModal({
   updating: boolean;
   onClose: () => void;
   onStatus: (status: OrderStatus) => void;
-  onPayment: (
-    status: Order["paymentStatus"],
-    reference: string,
-  ) => void;
+  onPayment: (status: Order["paymentStatus"], reference: string) => void;
 }) {
   const [paymentReference, setPaymentReference] = useState(
     order.paymentReference ?? "",
@@ -808,13 +814,13 @@ function OrderModal({
             </select>
           </label>
           <label className="flex-1 text-sm font-semibold">
-            Payment reference
+            Receipt number
             <input
               value={paymentReference}
               maxLength={100}
               onChange={(event) => setPaymentReference(event.target.value)}
               className="mt-2 w-full rounded-xl border border-stone-200 px-3 py-2"
-              placeholder="Receipt or transaction ID"
+              placeholder="Receipt number or transaction ID"
             />
           </label>
           <button

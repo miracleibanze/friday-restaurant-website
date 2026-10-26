@@ -29,6 +29,8 @@ export type Order = {
   deliveryFee: number;
   total: number;
   paymentMethod: string;
+  paymentStatus?: "pending" | "paid" | "failed";
+  paymentReference?: string;
   createdAt?: string;
   notes?: string;
 };

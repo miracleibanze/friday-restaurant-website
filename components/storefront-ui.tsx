@@ -11,6 +11,7 @@ import {
   LoaderCircle,
   Menu as MenuIcon,
   MessageCircle,
+  Mail,
   Phone,
   Plus,
   ShoppingBag,
@@ -275,6 +276,15 @@ export function StoreFooter() {
             <a href="tel:+250782723621" className="flex gap-3">
               <Phone size={18} className="text-friday" /> +250 782 723 621
             </a>
+            <a
+                href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent("pascaluwimana1@gmail.com")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex gap-3"
+              >
+                
+                <Mail size={18} className="text-friday" /> pascaluwimana1@gmail.com
+              </a>
             <p className="flex gap-3">
               <Clock3 size={18} className="text-friday" /> Daily, 10:00–22:30
             </p>
@@ -551,6 +561,20 @@ export function ConfirmedOrder({ order }: { order: Order | null }) {
               {order.paymentMethod.replace("-", " ")}
             </p>
           </div>
+          <div>
+            <p className="text-xs text-stone-300">Payment status</p>
+            <p className="mt-1 font-bold capitalize">
+              {order.paymentStatus ?? "pending"}
+            </p>
+          </div>
+          {order.paymentReference && (
+            <div>
+              <p className="text-xs text-stone-300">Receipt number</p>
+              <p className="mt-1 break-all font-bold">
+                {order.paymentReference}
+              </p>
+            </div>
+          )}
         </div>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link

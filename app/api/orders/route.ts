@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
         order: {
           orderNumber: order.orderNumber,
           status: order.status,
+          paymentStatus: order.paymentStatus ?? "pending",
           total: order.total,
           createdAt: order.createdAt.toISOString(),
           items: order.items.map(({ name, quantity }) => ({ name, quantity })),

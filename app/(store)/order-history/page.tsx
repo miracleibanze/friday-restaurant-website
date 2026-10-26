@@ -80,6 +80,14 @@ export default function OrderHistoryPage() {
                   {order.status}
                 </span>
                 <p className="mt-2 font-bold">{money(order.total)}</p>
+                <p className="mt-1 text-xs font-semibold capitalize text-stone-500">
+                  Payment: {order.paymentStatus ?? "pending"}
+                </p>
+                {order.paymentReference && (
+                  <p className="mt-1 text-xs text-stone-500">
+                    Receipt: {order.paymentReference}
+                  </p>
+                )}
               </div>
             </Link>
           ))}

@@ -211,7 +211,10 @@ function MenuManagement() {
           >
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
-                <h3 id="menu-item-modal-title" className="font-display text-2xl">
+                <h3
+                  id="menu-item-modal-title"
+                  className="font-display text-2xl"
+                >
                   {form.id ? "Edit menu item" : "Add menu item"}
                 </h3>
                 <p className="mt-1 text-sm text-stone-500">
@@ -229,109 +232,110 @@ function MenuManagement() {
               </button>
             </div>
             <Notice error={error} />
-            <form
-              onSubmit={save}
-              className="grid gap-4 sm:grid-cols-2"
-            >
-        <label className="text-sm font-semibold">
-          Dish name
-          <input
-            className={`${inputClass} mt-1`}
-            value={form.name}
-            required
-            maxLength={120}
-            onChange={(event) => setForm({ ...form, name: event.target.value })}
-          />
-        </label>
-        <label className="text-sm font-semibold">
-          Slug (optional)
-          <input
-            className={`${inputClass} mt-1`}
-            value={form.slug}
-            placeholder="Generated from name"
-            onChange={(event) => setForm({ ...form, slug: event.target.value })}
-          />
-        </label>
-        <label className="text-sm font-semibold">
-          Price (RWF)
-          <input
-            className={`${inputClass} mt-1`}
-            type="number"
-            min="0"
-            step="1"
-            value={form.price}
-            required
-            onChange={(event) =>
-              setForm({ ...form, price: event.target.value })
-            }
-          />
-        </label>
-        <label className="text-sm font-semibold">
-          Preparation time (minutes)
-          <input
-            className={`${inputClass} mt-1`}
-            type="number"
-            min="1"
-            max="240"
-            value={form.prepTime}
-            required
-            onChange={(event) =>
-              setForm({ ...form, prepTime: event.target.value })
-            }
-          />
-        </label>
-        <label className="text-sm font-semibold sm:col-span-2">
-          Image URL or site path
-          <input
-            className={`${inputClass} mt-1`}
-            value={form.image}
-            required
-            maxLength={1000}
-            placeholder="/dish.jpg"
-            onChange={(event) =>
-              setForm({ ...form, image: event.target.value })
-            }
-          />
-        </label>
-        <label className="text-sm font-semibold sm:col-span-2">
-          Description
-          <textarea
-            className={`${inputClass} mt-1 min-h-24`}
-            value={form.description}
-            required
-            maxLength={1000}
-            onChange={(event) =>
-              setForm({ ...form, description: event.target.value })
-            }
-          />
-        </label>
-        <label className="flex items-center gap-2 text-sm font-semibold">
-          <input
-            type="checkbox"
-            checked={form.available}
-            onChange={(event) =>
-              setForm({ ...form, available: event.target.checked })
-            }
-          />
-          Available for ordering
-        </label>
+            <form onSubmit={save} className="grid gap-4 sm:grid-cols-2">
+              <label className="text-sm font-semibold">
+                Dish name
+                <input
+                  className={`${inputClass} mt-1`}
+                  value={form.name}
+                  required
+                  maxLength={120}
+                  onChange={(event) =>
+                    setForm({ ...form, name: event.target.value })
+                  }
+                />
+              </label>
+              <label className="text-sm font-semibold">
+                Slug (optional)
+                <input
+                  className={`${inputClass} mt-1`}
+                  value={form.slug}
+                  placeholder="Generated from name"
+                  onChange={(event) =>
+                    setForm({ ...form, slug: event.target.value })
+                  }
+                />
+              </label>
+              <label className="text-sm font-semibold">
+                Price (RWF)
+                <input
+                  className={`${inputClass} mt-1`}
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={form.price}
+                  required
+                  onChange={(event) =>
+                    setForm({ ...form, price: event.target.value })
+                  }
+                />
+              </label>
+              <label className="text-sm font-semibold">
+                Preparation time (minutes)
+                <input
+                  className={`${inputClass} mt-1`}
+                  type="number"
+                  min="1"
+                  max="240"
+                  value={form.prepTime}
+                  required
+                  onChange={(event) =>
+                    setForm({ ...form, prepTime: event.target.value })
+                  }
+                />
+              </label>
+              <label className="text-sm font-semibold sm:col-span-2">
+                Image URL or site path
+                <input
+                  className={`${inputClass} mt-1`}
+                  value={form.image}
+                  required
+                  maxLength={1000}
+                  placeholder="/dish.jpg"
+                  onChange={(event) =>
+                    setForm({ ...form, image: event.target.value })
+                  }
+                />
+              </label>
+              <label className="text-sm font-semibold sm:col-span-2">
+                Description
+                <textarea
+                  className={`${inputClass} mt-1 min-h-24`}
+                  value={form.description}
+                  required
+                  maxLength={1000}
+                  onChange={(event) =>
+                    setForm({ ...form, description: event.target.value })
+                  }
+                />
+              </label>
+              <label className="flex items-center gap-2 text-sm font-semibold">
+                <input
+                  type="checkbox"
+                  checked={form.available}
+                  onChange={(event) =>
+                    setForm({ ...form, available: event.target.checked })
+                  }
+                />
+                Available for ordering
+              </label>
               <div className="flex flex-wrap gap-2 sm:col-span-2">
-          <button
-            disabled={saving}
-            className="rounded-full bg-charcoal px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50"
-          >
-            {saving ? "Saving…" : form.id ? "Save changes" : "Add dish"}
-          </button>
-          <button
-            type="button"
-            onClick={closeForm}
-            disabled={saving}
-            className="rounded-full border px-5 py-2.5 text-sm font-bold disabled:opacity-50"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
+                <button
+                  disabled={saving}
+                  className="rounded-full bg-charcoal px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50"
+                >
+                  {saving ? "Saving…" : form.id ? "Save changes" : "Add dish"}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeForm}
+                  disabled={saving}
+                  className="rounded-full border px-5 py-2.5 text-sm font-bold disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </section>
         </div>
       )}
@@ -355,7 +359,7 @@ function MenuManagement() {
                   {money(item.price)} · {item.prepTime ?? 25} min
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 ml-auto">
                 <button
                   type="button"
                   onClick={() => edit(item)}
@@ -366,7 +370,7 @@ function MenuManagement() {
                 <button
                   type="button"
                   onClick={() => void toggleAvailability(item)}
-                  className="rounded-lg border px-3 py-2 text-sm font-bold"
+                  className={`rounded-lg border px-3 py-2 text-sm font-bold ${item.available ? "bg-red-400 text-white hover:bg-red-500" : "bg-green-400 text-white hover:bg-green-500"}`}
                 >
                   {item.available ? "Disable" : "Enable"}
                 </button>
@@ -548,7 +552,7 @@ function PaymentRow({
         className={inputClass}
         value={reference}
         maxLength={100}
-        placeholder="Receipt / transaction reference"
+        placeholder="Receipt number / transaction reference"
         onChange={(event) => setReference(event.target.value)}
       />
       <button
@@ -659,7 +663,9 @@ function MessageInbox() {
               </p>
 
               <a
-                href={`https://mail.google.com/mail/?view=cm&to=${item.email}?su=${encodeURIComponent(`Re: ${item.subject}`)}`}
+                href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(item.email)}&su=${encodeURIComponent(`Re: ${item.subject}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="mt-4 inline-flex rounded-full bg-charcoal px-4 py-2 text-sm font-bold text-white"
               >
                 Reply by email
@@ -1005,7 +1011,7 @@ function CustomerManagement() {
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
-        <button className="rounded-xl bg-charcoal px-5 text-sm font-bold text-white">
+        <button className="rounded-xl bg-friday px-5 text-sm font-bold text-white">
           Search
         </button>
       </form>
@@ -1044,7 +1050,7 @@ function CustomerManagement() {
                     type="button"
                     disabled={historyLoading}
                     onClick={() => void showHistory(item.id)}
-                    className="rounded-lg border px-3 py-2 text-sm font-bold disabled:opacity-50"
+                    className="rounded-lg border px-3 py-2 text-sm font-bold disabled:opacity-50 hover:bg-stone-100"
                   >
                     {historyLoading ? "Loading…" : "History"}
                   </button>

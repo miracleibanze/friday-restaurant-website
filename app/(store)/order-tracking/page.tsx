@@ -103,6 +103,12 @@ export default function TrackingPage() {
                 {order.status.replace("-", " ")}
               </span>
             </div>
+            <p className="mt-5 rounded-2xl bg-stone-50 px-4 py-3 text-sm">
+              <span className="font-semibold">Payment status: </span>
+              <span className="capitalize">
+                {order.paymentStatus ?? "pending"}
+              </span>
+            </p>
             <div className="mt-8">
               {steps.map((step, index) => (
                 <div key={step} className="flex gap-4">
