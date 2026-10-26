@@ -3,24 +3,15 @@ import StoreProvider from "@/components/store-provider";
 import "./globals.css";
 
 const siteUrl = "https://friday-restaurant-website.vercel.app";
-
 const siteTitle = "Friday Restaurant | Chicken, Fish & Burgers in Kigali";
-
 const siteDescription =
   "Order whole chicken, half chicken, chicken wings, chicken legs, chicken burgers, beef burgers, and whole fish at Friday Restaurant in Kigali, Rwanda. Explore our menu and order online.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-
-  title: {
-    default: siteTitle,
-    template: "%s | Friday Restaurant",
-  },
-
+  title: { default: siteTitle, template: "%s | Friday Restaurant" },
   description: siteDescription,
-
   applicationName: "Friday Restaurant",
-
   keywords: [
     "Friday Restaurant",
     "restaurant in Kigali",
@@ -40,10 +31,8 @@ export const metadata: Metadata = {
     "Kigali restaurant menu",
     "restaurants in Rwanda",
   ],
-
   authors: [{ name: "Friday Restaurant" }],
   creator: "Friday Restaurant",
-
   openGraph: {
     type: "website",
     url: siteUrl,
@@ -53,35 +42,27 @@ export const metadata: Metadata = {
     description: siteDescription,
     images: [
       {
-        url: "/logo2.png",
+        url: `${siteUrl}/logo2.png`,
         width: 1200,
         height: 630,
         alt: "Friday Restaurant — chicken, fish, and burgers in Kigali",
       },
     ],
   },
-
   twitter: {
     card: "summary_large_image",
     title: siteTitle,
     description: siteDescription,
-    images: ["/logo2.png"],
+    images: [`${siteUrl}/logo2.png`],
   },
-
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
-    },
-  },
+  robots: { index: true, follow: true },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
