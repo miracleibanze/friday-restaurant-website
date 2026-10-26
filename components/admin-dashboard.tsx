@@ -760,10 +760,6 @@ function OrderModal({
             <span>Subtotal</span>
             <span>{money(order.subtotal)}</span>
           </div>
-          <div className="flex justify-between text-stone-500">
-            <span>Delivery</span>
-            <span>{order.deliveryFee ? money(order.deliveryFee) : "Free"}</span>
-          </div>
           <div className="flex justify-between border-t border-stone-200 pt-3 font-bold">
             <span>Total</span>
             <span>{money(order.total)}</span>

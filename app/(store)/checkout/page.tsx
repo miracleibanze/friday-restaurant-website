@@ -27,7 +27,6 @@ export default function CheckoutPage() {
     (sum, item) => sum + item.food.price * item.quantity,
     0,
   );
-  const delivery = subtotal >= 30_000 ? 0 : 2_000;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   if (!initialized || sessionStatus === "idle" || sessionStatus === "loading") {
@@ -172,10 +171,10 @@ export default function CheckoutPage() {
           >
             {loading
               ? "Placing your order…"
-              : `Place order · ${money(subtotal + delivery)}`}
+              : `Place order · ${money(subtotal)}`}
           </button>
         </form>
-        <OrderSummary subtotal={subtotal} delivery={delivery} />
+        <OrderSummary subtotal={subtotal} />
       </div>
     </main>
   );

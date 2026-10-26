@@ -105,9 +105,6 @@ export function StoreHeader({ minimal = false }: { minimal?: boolean }) {
   }, [cart]);
   return (
     <>
-      <div className="bg-charcoal py-1 text-center text-xs font-semibold text-white">
-        Free delivery in Kigali on orders over 30,000 RWF
-      </div>
       <header className="sticky top-0 z-40 border-b border-stone-200/70 backdrop-blur-xl bg-white/20">
         <div className="shell flex h-15 items-center justify-between">
           <Logo />
@@ -453,37 +450,33 @@ export function EmptyState({
 
 export function OrderSummary({
   subtotal,
-  delivery,
   action,
 }: {
   subtotal: number;
-  delivery: number;
   action?: React.ReactNode;
 }) {
   return (
     <aside className="h-fit rounded-3xl bg-charcoal p-7 text-white">
       <h2 className="font-display text-2xl font-light">Order summary</h2>
-      <div className="mt-6 space-y-4 border-b border-white/10 pb-6 text-sm">
+      <div className="mt-6 border-b border-white/10 pb-6 text-sm">
         <div className="flex justify-between text-stone-300">
           <span>Subtotal</span>
           <span className="text-white">{money(subtotal)}</span>
-        </div>
-        <div className="flex justify-between text-stone-300">
-          <span>Delivery</span>
-          <span className="text-white">
-            {delivery ? money(delivery) : "Free"}
-          </span>
         </div>
       </div>
       <div className="my-6 flex items-end justify-between">
         <span className="font-bold">Total</span>
         <span className="font-display text-2xl">
-          {money(subtotal + delivery)}
+          {money(subtotal)}
         </span>
       </div>
       {action}
-      <p className="mt-4 text-center text-xs text-stone-500">
-        Checkout · Freshness guaranteed
+      <p className="mt-4 text-center text-xs leading-5 text-stone-400">
+        Delivery charges vary by location.{" "}
+        <Link href="/contact" className="font-semibold text-white underline">
+          Contact us
+        </Link>{" "}
+        for delivery information.
       </p>
     </aside>
   );

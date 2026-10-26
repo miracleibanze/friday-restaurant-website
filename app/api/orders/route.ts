@@ -78,7 +78,6 @@ export async function POST(request: NextRequest) {
     }
 
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const deliveryFee = subtotal >= 30_000 ? 0 : 2_000;
     const order = await Order.create({
       orderNumber: `FR-${Date.now().toString(36).toUpperCase()}-${randomBytes(3).toString("hex").toUpperCase()}`,
       customerId,
@@ -88,8 +87,8 @@ export async function POST(request: NextRequest) {
       deliveryAddress: address,
       items,
       subtotal,
-      deliveryFee,
-      total: subtotal + deliveryFee,
+      deliveryFee: 0,
+      total: subtotal,
       paymentMethod,
       notes: typeof body.notes === "string" ? body.notes.trim().slice(0, 500) : "",
       status: "confirmed",

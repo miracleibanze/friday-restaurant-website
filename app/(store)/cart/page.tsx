@@ -21,7 +21,6 @@ export default function CartPage() {
     (sum, item) => sum + item.food.price * item.quantity,
     0,
   );
-  const delivery = subtotal >= 30_000 ? 0 : 2_000;
   if (!initialized) return <PageLoader label="Restoring your basket…" />;
   if (!cart.length)
     return (
@@ -117,7 +116,6 @@ export default function CartPage() {
         </div>
         <OrderSummary
           subtotal={subtotal}
-          delivery={delivery}
           action={
             <Link href="/checkout" className={`${buttonClass} w-full`}>
               Continue to checkout <ArrowRight size={17} />
