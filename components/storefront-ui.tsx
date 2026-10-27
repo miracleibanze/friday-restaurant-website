@@ -29,7 +29,7 @@ import Image from "next/image";
 export const money = (value: number) =>
   `${new Intl.NumberFormat("en-RW").format(value)} RWF`;
 export const inputClass =
-  "w-full rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-sm outline-none transition placeholder:text-stone-300 focus:border-friday focus:ring-4 focus:ring-orange-100";
+  "w-full rounded-2xl border border-stone-300 bg-white px-4 py-3.5 text-sm outline-none transition placeholder:text-stone-300 focus:border-friday focus:ring-4 focus:ring-orange-100";
 export const buttonClass =
   "inline-flex items-center justify-center gap-2 rounded-full bg-friday px-6 py-3.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-friday-dark disabled:cursor-not-allowed disabled:opacity-50";
 export function PageLoader({ label }: { label: string }) {
