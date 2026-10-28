@@ -78,7 +78,7 @@ export default function AdminDashboard() {
   const [counts, setCounts] = useState<Counts>({});
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(10);
   const [pages, setPages] = useState(0);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -596,7 +596,7 @@ export default function AdminDashboard() {
                       onClick={() =>
                         setPage((current) => Math.max(1, current - 1))
                       }
-                      className="rounded-lg border border-stone-200 p-2 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-40"
+                      className="rounded-lg border border-stone-300 p-2 hover:bg-stone-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       <ChevronLeft size={18} />
                     </button>
@@ -607,7 +607,7 @@ export default function AdminDashboard() {
                       onClick={() =>
                         setPage((current) => Math.min(pages, current + 1))
                       }
-                      className="rounded-lg border border-stone-200 p-2 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-40"
+                      className="rounded-lg border border-stone-300 p-2 hover:bg-stone-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       <ChevronRight size={18} />
                     </button>
