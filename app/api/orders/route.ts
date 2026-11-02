@@ -75,7 +75,6 @@ export async function POST(request: NextRequest) {
       accompaniments?: unknown;
     }>;
     const items = [];
-    let totalAccompaniments = 0;
     for (const requested of requestedItems) {
       if (typeof requested.food !== "string" || !Number.isInteger(requested.quantity) || Number(requested.quantity) < 1 || Number(requested.quantity) > 20) {
         return NextResponse.json({ error: "One or more order quantities are invalid." }, { status: 400 });
@@ -99,9 +98,9 @@ export async function POST(request: NextRequest) {
           if (count !== undefined) accompaniments[type] = Number(count);
         }
       }
-      totalAccompaniments += accompanimentTotal(accompaniments);
-      if (totalAccompaniments > maxAccompaniments) {
-        return NextResponse.json({ error: "Choose no more than four accompaniments in total." }, { status: 400 });
+
+      if (accompanimentTotal(accompaniments) > maxAccompaniments) {
+        return NextResponse.json({ error: "Choose no more than four accompaniments for each menu item." }, { status: 400 });
       }
       items.push({
         food: food.id,
@@ -140,5 +139,76 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Could not create order.", error);
     return NextResponse.json({ error: "Could not place your order." }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const orderNumber =
+      typeof body.orderNumber === "string" ? body.orderNumber.trim() : "";
+    const phone = typeof body.phone === "string" ? body.phone.trim() : "";
+    if (!orderNumber || !phone || !phone.replace(/\D/g, "")) {
+      return NextResponse.json(
+        { error: "Enter the order number and phone number used for the order." },
+        { status: 400 },
+      );
+    }
+
+    await connectToDatabase();
+    const order = await Order.findOne({ orderNumber });
+    if (!order) {
+      return NextResponse.json({ error: "Order not found." }, { status: 404 });
+    }
+    if (order.phone.replace(/\D/g, "") !== phone.replace(/\D/g, "")) {
+      return NextResponse.json(
+        { error: "That phone number does not match the order." },
+        { status: 403 },
+      );
+    }
+    if (order.status === "delivered") {
+      return NextResponse.json({
+        order: { orderNumber: order.orderNumber, status: order.status },
+      });
+    }
+    if (order.status !== "on-the-way") {
+      return NextResponse.json(
+        { error: "You can confirm delivery once your order is on the way." },
+        { status: 409 },
+      );
+    }
+
+    const updatedOrder = await Order.findOneAndUpdate(
+      { _id: order._id, status: "on-the-way" },
+      { $set: { status: "delivered" } },
+      { new: true, runValidators: true },
+    );
+    if (!updatedOrder) {
+      const currentOrder = await Order.findById(order._id).select("orderNumber status");
+      if (currentOrder?.status === "delivered") {
+        return NextResponse.json({
+          order: {
+            orderNumber: currentOrder.orderNumber,
+            status: currentOrder.status,
+          },
+        });
+      }
+      return NextResponse.json(
+        { error: "The order status changed. Refresh tracking and try again." },
+        { status: 409 },
+      );
+    }
+    return NextResponse.json({
+      order: {
+        orderNumber: updatedOrder.orderNumber,
+        status: updatedOrder.status,
+      },
+    });
+  } catch (error) {
+    console.error("Could not confirm order delivery.", error);
+    return NextResponse.json(
+      { error: "Could not confirm order delivery." },
+      { status: 500 },
+    );
   }
 }

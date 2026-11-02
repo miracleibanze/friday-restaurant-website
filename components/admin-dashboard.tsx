@@ -536,17 +536,7 @@ export default function AdminDashboard() {
                         </span>
 
                         <div className="flex items-center gap-2">
-                          {order.status !== "delivered" &&
-                            order.status !== "cancelled" && (
-                              <button
-                                type="button"
-                                disabled={updatingId === order.id}
-                                onClick={() => void changeStatus(order, "delivered")}
-                                className="rounded-xl bg-green-700 px-3 py-2 text-sm font-bold text-white transition hover:bg-green-800 disabled:opacity-50"
-                              >
-                                Mark delivered
-                              </button>
-                            )}
+                          
                           <select
                             aria-label={`Update ${order.orderNumber} status`}
                             className="max-w-40 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm font-semibold"

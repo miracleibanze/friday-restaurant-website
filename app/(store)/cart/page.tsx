@@ -5,9 +5,9 @@ import {
   EmptyState,
   money,
   OrderSummary,
-  PageLoader,
   SectionTitle,
 } from "@/components/storefront-ui";
+import { PageLoader } from "@/app/loading";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { removeFromCart, updateCartItem } from "@/lib/store/store";
 import { displayFoodName } from "@/lib/accompaniments";

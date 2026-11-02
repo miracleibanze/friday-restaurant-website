@@ -2,7 +2,7 @@
 
 import { ConfirmedOrder } from "@/components/storefront-ui";
 import { useAppSelector } from "@/lib/store/hooks";
-import { PageLoader } from "@/components/storefront-ui";
+import { PageLoader } from "@/app/loading";
 
 export default function OrderConfirmationPage({ id }: { id?: string }) {
   const initialized = useAppSelector((state) => state.app.initialized);

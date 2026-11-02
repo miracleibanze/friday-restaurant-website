@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Camera,
   ChevronUp,
   CircleUserRound,
   Clock3,
   MapPin,
-  LoaderCircle,
   Menu as MenuIcon,
   MessageCircle,
   Mail,
@@ -41,20 +41,6 @@ export const inputClass =
   "w-full rounded-2xl border border-stone-300 bg-white px-4 py-3.5 text-sm outline-none transition placeholder:text-stone-300 focus:border-friday focus:ring-4 focus:ring-orange-100";
 export const buttonClass =
   "inline-flex items-center justify-center gap-2 rounded-full bg-friday px-6 py-3.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-friday-dark disabled:cursor-not-allowed disabled:opacity-50";
-export function PageLoader({ label }: { label: string }) {
-  return (
-    <main className="shell grid min-h-[60vh] place-items-center py-14">
-      <div
-        role="status"
-        aria-live="polite"
-        className="flex items-center gap-3 text-sm font-semibold text-stone-500"
-      >
-        <LoaderCircle size={20} className="animate-spin text-friday" />
-        <span>{label}</span>
-      </div>
-    </main>
-  );
-}
 
 export function useAddFood() {
   const dispatch = useAppDispatch();
@@ -77,37 +63,54 @@ export function AccompanimentSelector({
   const selectedTotal = accompanimentTotal(value);
   return (
     <fieldset className="mt-4">
-      <legend className="text-sm font-bold">Choose accompaniments (up to 4)</legend>
-      <div className="mt-2 grid grid-cols-3 gap-2">
+      <legend className="text-sm font-bold">Choose accompaniments</legend>
+      <div className="mt-3 grid gap-2">
         {accompanimentTypes.map((type: AccompanimentType) => {
           const otherCount = selectedTotal - value[type];
-          const highestCount = Math.max(0, Math.min(4, maxTotal - otherCount));
+          const canAdd =
+            value[type] < maxAccompaniments &&
+            otherCount + value[type] < maxTotal;
           return (
-            <label key={type} className="text-xs font-semibold capitalize text-stone-600">
-              {type}
-              <select
-                aria-label={`${type} accompaniment count`}
-                className="mt-1 w-full rounded-lg border border-stone-200 bg-white px-2 py-2 text-sm"
-                value={value[type]}
-                onChange={(event) =>
-                  onChange({
-                    ...value,
-                    [type]: Math.min(Number(event.target.value), highestCount),
-                  })
-                }
-              >
-                {Array.from({ length: highestCount + 1 }, (_, count) => (
-                  <option key={count} value={count}>
-                    {count}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <div
+              key={type}
+              className="flex items-center justify-between rounded-xl border border-stone-200 px-3 py-2"
+            >
+              <span className="text-sm font-semibold capitalize">{type}</span>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  aria-label={`Remove one ${type}`}
+                  disabled={value[type] === 0}
+                  onClick={() =>
+                    onChange({ ...value, [type]: Math.max(0, value[type] - 1) })
+                  }
+                  className="flex size-8 items-center justify-center rounded-full border border-stone-200 disabled:opacity-40"
+                >
+                  −
+                </button>
+                <span
+                  aria-label={`${value[type]} ${type}`}
+                  className="w-4 text-center text-sm font-bold tabular-nums"
+                >
+                  {value[type]}
+                </span>
+                <button
+                  type="button"
+                  aria-label={`Add one ${type}`}
+                  disabled={!canAdd}
+                  onClick={() => onChange({ ...value, [type]: value[type] + 1 })}
+                  className="flex size-8 items-center justify-center rounded-full border border-stone-200 disabled:opacity-40"
+                >
+                  +
+                </button>
+              </div>
+            </div>
           );
         })}
       </div>
       <p className="mt-1 text-xs text-stone-500">
-        {selectedTotal} of {maxTotal} selected
+        {selectedTotal} selected ·{" "}
+        {Math.max(0, maxTotal - selectedTotal)} more allowed for this item
       </p>
     </fieldset>
   );
@@ -166,7 +169,7 @@ export function StoreHeader({ minimal = false }: { minimal?: boolean }) {
   }, [cart]);
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-stone-200/70 backdrop-blur-xl bg-white/20">
+      <header className="sticky top-0 z-[999] border-b border-stone-200/70 backdrop-blur-xl bg-white/40">
         <div className="shell flex h-15 items-center justify-between">
           <Logo />
           <div className="flex items-center gap-1.5">
@@ -431,11 +434,29 @@ export function FoodCard({
     ...emptyAccompaniments,
   });
   const cart = useAppSelector((state) => state.app.cart);
-  const alreadySelected = cart.reduce(
-    (total, item) => total + accompanimentTotal(item.accompaniments),
+  const selectedForFood =
+    cart.find((item) => item.food.id === food.id)?.accompaniments;
+  const remaining = Math.max(
     0,
+    maxAccompaniments - accompanimentTotal(selectedForFood),
   );
-  const remaining = Math.max(0, maxAccompaniments - alreadySelected);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (!dialogOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [dialogOpen]);
+
+  function addSelectedFood() {
+    add(food, 1, accompaniments);
+    setAccompaniments({ ...emptyAccompaniments });
+    setDialogOpen(false);
+  }
+
   return (
     <article
       className="food-shadow group overflow-hidden rounded-[1.75rem] bg-white sm:
@@ -479,20 +500,12 @@ export function FoodCard({
             {food.rating}
           </span>
         </div>
-        <AccompanimentSelector
-        value={accompaniments}
-        onChange={setAccompaniments}
-        maxTotal={remaining}
-        />
         <div className="mt-5 flex items-center justify-between">
           <span className="font-bold text-lg">{money(food.price)}</span>
           <button
             type="button"
             disabled={!food.available}
-            onClick={() => {
-              add(food, 1, accompaniments);
-              setAccompaniments({ ...emptyAccompaniments });
-            }}
+            onClick={() => setDialogOpen(true)}
             className="bg-charcoal flex size-11 items-center justify-center rounded-full text-white transition hover:rotate-6 hover:bg-friday disabled:opacity-30"
             aria-label={`Add ${displayFoodName(food.name)} to cart`}
           >
@@ -500,6 +513,66 @@ export function FoodCard({
           </button>
         </div>
       </div>
+      {dialogOpen &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setDialogOpen(false);
+            }}
+          >
+            <section
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={`accompaniments-title-${food.id}`}
+              className="my-auto w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2
+                    id={`accompaniments-title-${food.id}`}
+                    className="font-display text-2xl"
+                  >
+                    Add to your order
+                  </h2>
+                  <p className="mt-1 text-sm text-stone-500">
+                    {displayFoodName(food.name)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setDialogOpen(false)}
+                  aria-label="Close accompaniment choices"
+                  className="rounded-full bg-stone-100 p-2 hover:bg-stone-200"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              <AccompanimentSelector
+                value={accompaniments}
+                onChange={setAccompaniments}
+                maxTotal={remaining}
+              />
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDialogOpen(false)}
+                  className="rounded-full border border-stone-200 px-5 py-3 text-sm font-bold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={addSelectedFood}
+                  className={buttonClass}
+                >
+                  Add to bag
+                </button>
+              </div>
+            </section>
+          </div>,
+          document.body,
+        )}
     </article>
   );
 }

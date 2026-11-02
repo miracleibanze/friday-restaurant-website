@@ -5,29 +5,29 @@ import {
   inputClass,
   SectionTitle,
 } from "@/components/storefront-ui";
+import { PageLoader } from "@/app/loading";
 import { Order } from "@/lib/store/store";
 import { Check } from "lucide-react";
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 export default function TrackingPage() {
   const [number, setNumber] = useState("");
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState("");
+  const [deliveryError, setDeliveryError] = useState("");
+  const [phone, setPhone] = useState("");
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    const initial = new URLSearchParams(window.location.search).get("number");
-    if (initial) setNumber(initial);
-  }, []);
-  async function track(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const [confirmingDelivery, setConfirmingDelivery] = useState(false);
+  const lookupOrder = useCallback(async (orderNumber: string) => {
     setLoading(true);
     setError("");
+    setDeliveryError("");
     setOrder(null);
     setSearched(true);
     try {
       const response = await fetch(
-        `/api/orders?orderNumber=${encodeURIComponent(number.trim())}`,
+        `/api/orders?orderNumber=${encodeURIComponent(orderNumber.trim())}`,
       );
       const result = await response.json();
       if (!response.ok)
@@ -41,6 +41,44 @@ export default function TrackingPage() {
       );
     } finally {
       setLoading(false);
+    }
+  }, []);
+  useEffect(() => {
+    const initial = new URLSearchParams(window.location.search).get("number");
+    if (initial?.trim()) {
+      setNumber(initial);
+      void lookupOrder(initial);
+    }
+  }, [lookupOrder]);
+  function track(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void lookupOrder(number);
+  }
+  async function confirmDelivery(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!order) return;
+    setConfirmingDelivery(true);
+    setDeliveryError("");
+    try {
+      const response = await fetch("/api/orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderNumber: order.orderNumber, phone }),
+      });
+      const result = await response.json();
+      if (!response.ok)
+        throw new Error(result.error || "Could not confirm delivery.");
+      setOrder((current) =>
+        current ? { ...current, status: result.order.status } : current,
+      );
+    } catch (cause) {
+      setDeliveryError(
+        cause instanceof Error
+          ? cause.message
+          : "Could not confirm delivery.",
+      );
+    } finally {
+      setConfirmingDelivery(false);
     }
   }
   const steps = [
@@ -87,7 +125,7 @@ export default function TrackingPage() {
             {error}
           </p>
         )}
-        {searched && !order && !error && (
+        {searched && !loading && !order && !error && (
           <p className="mt-5 rounded-2xl bg-orange-50 p-4 text-sm font-semibold text-stone-700">
             We couldn’t find that order. Check the number and try again.
           </p>
@@ -109,6 +147,47 @@ export default function TrackingPage() {
                 {order.paymentStatus ?? "pending"}
               </span>
             </p>
+            {order.status === "on-the-way" && (
+              <form
+                onSubmit={confirmDelivery}
+                className="mt-5 rounded-2xl border border-green-200 bg-green-50 p-4"
+              >
+                <h2 className="font-bold text-green-900">
+                  Has your order arrived?
+                </h2>
+                <p className="mt-1 text-sm text-green-800">
+                  Confirm delivery so the restaurant knows it reached you.
+                </p>
+                <label className="mt-4 block text-sm font-semibold text-stone-700">
+                  Phone number used for this order
+                  <input
+                    type="tel"
+                    autoComplete="tel"
+                    value={phone}
+                    onChange={(event) => setPhone(event.target.value)}
+                    className={`${inputClass} mt-2`}
+                    required
+                  />
+                </label>
+                {deliveryError && (
+                  <p role="alert" className="mt-3 text-sm font-semibold text-red-700">
+                    {deliveryError}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={confirmingDelivery}
+                  className={`${buttonClass} mt-4`}
+                >
+                  {confirmingDelivery ? "Confirming…" : "Confirm delivery"}
+                </button>
+              </form>
+            )}
+            {order.status === "delivered" && (
+              <p className="mt-5 rounded-2xl bg-green-50 px-4 py-3 text-sm font-semibold text-green-800">
+                This order has been marked as delivered. Thank you for confirming!
+              </p>
+            )}
             <div className="mt-8">
               {steps.map((step, index) => (
                 <div key={step} className="flex gap-4">
@@ -142,6 +221,7 @@ export default function TrackingPage() {
           </div>
         )}
       </div>
+      {loading && <PageLoader label="Finding your order…" overlay />}
     </main>
   );
 }

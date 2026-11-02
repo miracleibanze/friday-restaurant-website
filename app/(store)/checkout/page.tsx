@@ -8,9 +8,9 @@ import {
   inputClass,
   money,
   OrderSummary,
-  PageLoader,
   SectionTitle,
 } from "@/components/storefront-ui";
+import { PageLoader } from "@/app/loading";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { completeOrder, Order } from "@/lib/store/store";
 import { useRouter } from "next/navigation";
@@ -180,6 +180,7 @@ export default function CheckoutPage() {
         </form>
         <OrderSummary subtotal={subtotal} />
       </div>
+      {loading && <PageLoader label="Placing your order…" overlay />}
     </main>
   );
 }

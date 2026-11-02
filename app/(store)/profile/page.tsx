@@ -4,9 +4,9 @@ import {
   buttonClass,
   EmptyState,
   Field,
-  PageLoader,
   SectionTitle,
 } from "@/components/storefront-ui";
+import { PageLoader } from "@/app/loading";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import {
   restoreSession,

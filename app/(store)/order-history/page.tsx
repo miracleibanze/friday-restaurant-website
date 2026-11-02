@@ -1,6 +1,7 @@
 'use client'
 
-import { EmptyState, money, PageLoader, SectionTitle } from "@/components/storefront-ui";
+import { EmptyState, money, SectionTitle } from "@/components/storefront-ui";
+import { PageLoader } from "@/app/loading";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { loadOrders, restoreSession } from "@/lib/store/store";
 import Link from "next/link";

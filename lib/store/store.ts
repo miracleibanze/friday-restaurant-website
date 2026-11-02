@@ -156,15 +156,17 @@ const appSlice = createSlice({
     ) {
       const quantity = action.payload.quantity ?? 1;
       const accompaniments = action.payload.accompaniments ?? emptyAccompaniments;
-      const currentTotal = state.cart.reduce(
-        (total, item) => total + accompanimentTotal(item.accompaniments),
-        0,
-      );
-      if (currentTotal + accompanimentTotal(accompaniments) > maxAccompaniments) return;
       const item = state.cart.find(
         ({ food }) => food.id === action.payload.food.id,
       );
       if (item) {
+        if (
+          accompanimentTotal(item.accompaniments) +
+            accompanimentTotal(accompaniments) >
+          maxAccompaniments
+        ) {
+          return;
+        }
         item.quantity += quantity;
         for (const type of Object.keys(accompaniments) as Array<keyof Accompaniments>) {
           item.accompaniments[type] += accompaniments[type];

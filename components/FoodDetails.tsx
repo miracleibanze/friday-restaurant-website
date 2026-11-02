@@ -7,6 +7,7 @@ import {
   useAddFood,
   AccompanimentSelector,
 } from "@/components/storefront-ui";
+import { PageLoader } from "@/app/loading";
 import { displayFoodName } from "@/lib/accompaniments";
 import { menuFoods } from "@/lib/menu-data";
 import { Check, Clock3, Minus, Plus, Star } from "lucide-react";
@@ -14,7 +15,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { useEffect } from "react";
 import type { Food } from "@/lib/menu-data";
-import { PageLoader } from "@/components/storefront-ui";
 import {
   accompanimentTotal,
   emptyAccompaniments,
@@ -38,11 +38,13 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
     ...emptyAccompaniments,
   });
   const cart = useAppSelector((state) => state.app.cart);
-  const alreadySelected = cart.reduce(
-    (total, item) => total + accompanimentTotal(item.accompaniments),
+  const selectedForFood = cart.find(
+    (item) => item.food.id === food?.id,
+  )?.accompaniments;
+  const remaining = Math.max(
     0,
+    maxAccompaniments - accompanimentTotal(selectedForFood),
   );
-  const remaining = Math.max(0, maxAccompaniments - alreadySelected);
   useEffect(() => {
     const controller = new AbortController();
     fetch("/api/menu", { signal: controller.signal })
