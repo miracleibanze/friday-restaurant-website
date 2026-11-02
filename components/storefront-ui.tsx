@@ -360,7 +360,7 @@ export function StoreFooter() {
           Made in Kigali.
         </Link>
       </div>
-      <div className="mt-6 border-t border-stone-200/70 pt-2 pb-6 text-center">
+      <div className="mt-6 border-t border-stone-200/70 pt-2 pb-4 text-center">
         <p className="text-xs text-stone-300">
           Website by{" "}
           <a
