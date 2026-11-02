@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ensureMenuSeeded, serializeMenuItem } from "@/lib/menu-catalog";
+import {
+  ensureMenuDatabaseConnected,
+  serializeMenuItem,
+} from "@/lib/menu-catalog";
 import { MenuItem } from "@/lib/models/menu-item";
 import { getSession } from "@/lib/session";
+
+const maxMenuImageBytes = 5 * 1024 * 1024;
+const maxMenuImageDataUrlLength = 7_000_000;
+const menuImageDataUrlPattern =
+  /^data:(image\/(?:jpeg|png|webp|gif));base64,([A-Za-z0-9+/]+={0,2})$/;
 
 async function requireAdmin(request: NextRequest) {
   const session = await getSession(request);
@@ -17,6 +25,41 @@ function slugify(value: string) {
     .slice(0, 100);
 }
 
+function validImageDataUrl(image: string) {
+  if (!image.startsWith("data:")) return image.length <= 1000;
+  if (image.length > maxMenuImageDataUrlLength) return false;
+
+  const match = menuImageDataUrlPattern.exec(image);
+  if (!match) return false;
+  const [, contentType, base64] = match;
+  const buffer = Buffer.from(base64, "base64");
+  if (
+    buffer.length === 0 ||
+    buffer.length > maxMenuImageBytes ||
+    buffer.toString("base64") !== base64
+  ) {
+    return false;
+  }
+
+  switch (contentType) {
+    case "image/jpeg":
+      return buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+    case "image/png":
+      return buffer.subarray(0, 8).equals(
+        Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+      );
+    case "image/webp":
+      return (
+        buffer.toString("ascii", 0, 4) === "RIFF" &&
+        buffer.toString("ascii", 8, 12) === "WEBP"
+      );
+    case "image/gif":
+      return ["GIF87a", "GIF89a"].includes(buffer.toString("ascii", 0, 6));
+    default:
+      return false;
+  }
+}
+
 function validateFields(body: Record<string, unknown>) {
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const description =
@@ -30,7 +73,7 @@ function validateFields(body: Record<string, unknown>) {
     !description ||
     description.length > 1000 ||
     !image ||
-    image.length > 1000 ||
+    !validImageDataUrl(image) ||
     !Number.isFinite(price) ||
     price < 0 ||
     !Number.isInteger(prepTime) ||
@@ -49,7 +92,7 @@ export async function GET(request: NextRequest) {
     if (!(await requireAdmin(request))) {
       return NextResponse.json({ error: "Administrator access required." }, { status: 403 });
     }
-    await ensureMenuSeeded();
+    await ensureMenuDatabaseConnected();
     const items = await MenuItem.find().sort({ createdAt: 1 });
     return NextResponse.json({ items: items.map(serializeMenuItem) });
   } catch (error) {
@@ -63,7 +106,7 @@ export async function POST(request: NextRequest) {
     if (!(await requireAdmin(request))) {
       return NextResponse.json({ error: "Administrator access required." }, { status: 403 });
     }
-    await ensureMenuSeeded();
+    await ensureMenuDatabaseConnected();
     const body = await request.json();
     const fields = validateFields(body);
     if (!fields) {
@@ -89,7 +132,7 @@ export async function PATCH(request: NextRequest) {
     if (!(await requireAdmin(request))) {
       return NextResponse.json({ error: "Administrator access required." }, { status: 403 });
     }
-    await ensureMenuSeeded();
+    await ensureMenuDatabaseConnected();
     const body = await request.json();
     if (typeof body.id !== "string" || !body.id) {
       return NextResponse.json({ error: "A menu item id is required." }, { status: 400 });
@@ -119,18 +162,16 @@ export async function DELETE(request: NextRequest) {
     if (!(await requireAdmin(request))) {
       return NextResponse.json({ error: "Administrator access required." }, { status: 403 });
     }
-    await ensureMenuSeeded();
+    await ensureMenuDatabaseConnected();
     const id = request.nextUrl.searchParams.get("id");
     if (!id) return NextResponse.json({ error: "A menu item id is required." }, { status: 400 });
-    const item = await MenuItem.findOneAndUpdate(
-      { id },
-      { $set: { available: false } },
-      { new: true },
-    );
-    if (!item) return NextResponse.json({ error: "Menu item not found." }, { status: 404 });
-    return NextResponse.json({ item: serializeMenuItem(item) });
+    const result = await MenuItem.deleteOne({ id });
+    if (result.deletedCount === 0) {
+      return NextResponse.json({ error: "Menu item not found." }, { status: 404 });
+    }
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Could not disable menu item.", error);
-    return NextResponse.json({ error: "Could not disable menu item." }, { status: 500 });
+    console.error("Could not delete menu item.", error);
+    return NextResponse.json({ error: "Could not delete menu item." }, { status: 500 });
   }
 }

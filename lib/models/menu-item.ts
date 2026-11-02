@@ -26,7 +26,7 @@ const menuItemSchema = new Schema<MenuItemFields>(
     price: { type: Number, required: true, min: 0 },
     available: { type: Boolean, default: true },
     prepTime: { type: Number, required: true, min: 1, max: 240, default: 25 },
-    image: { type: String, required: true, trim: true, maxlength: 1000 },
+    image: { type: String, required: true, trim: true, maxlength: 7_000_000 },
     rating: { type: Number, min: 0, max: 5, default: 4.7 },
     calories: { type: Number, min: 0 },
   },

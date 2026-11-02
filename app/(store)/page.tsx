@@ -7,7 +7,6 @@ import {
   SectionTitle,
   useAddFood,
 } from "@/components/storefront-ui";
-import { menuFoods } from "@/lib/menu-data";
 import { ArrowRight, Clock3, Phone, Star, WavesVertical } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,20 +15,33 @@ import type { Food } from "@/lib/menu-data";
 
 export default function HomePage() {
   const add = useAddFood();
-  const [foods, setFoods] = useState<Food[]>(menuFoods);
+  const [foods, setFoods] = useState<Food[]>([]);
+  const [menuLoading, setMenuLoading] = useState(true);
+  const [menuError, setMenuError] = useState("");
   useEffect(() => {
     const controller = new AbortController();
+    let active = true;
     fetch("/api/menu", { signal: controller.signal })
       .then(async (response) => {
         const result = await response.json();
         if (!response.ok) throw new Error(result.error || "Could not load menu.");
-        setFoods(result.items);
+        if (!Array.isArray(result.items)) {
+          throw new Error("The menu response is invalid.");
+        }
+        if (active) setFoods(result.items);
       })
       .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === "AbortError") return;
+        if (!active || (error instanceof DOMException && error.name === "AbortError")) return;
         console.error("Could not refresh storefront menu.", error);
+        setMenuError("Could not load the menu. Please try again later.");
+      })
+      .finally(() => {
+        if (active) setMenuLoading(false);
       });
-    return () => controller.abort();
+    return () => {
+      active = false;
+      controller.abort();
+    };
   }, []);
   return (
     <>
@@ -99,9 +111,23 @@ export default function HomePage() {
             text="Made fresh when you order, with generous portions and ingredients we’re proud of."
           />
           <div className="flex flex-wrap gap-5 flex-column lg:flex-row max-lg:items-center">
-            {foods.map((food) => (
-              <FoodCard key={food.id} food={food} add={add} />
-            ))}
+            {menuLoading ? (
+              <p role="status" className="w-full py-10 text-center text-stone-500">
+                Loading menu…
+              </p>
+            ) : menuError ? (
+              <p role="alert" className="w-full py-10 text-center text-red-700">
+                {menuError}
+              </p>
+            ) : foods.length > 0 ? (
+              foods.map((food) => (
+                <FoodCard key={food.id} food={food} add={add} />
+              ))
+            ) : (
+              <p className="w-full py-10 text-center text-stone-500">
+                No menu items are currently available.
+              </p>
+            )}
           </div>
         </div>
       </section>

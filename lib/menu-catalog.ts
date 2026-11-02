@@ -1,23 +1,12 @@
 import { connectToDatabase } from "@/lib/db";
-import { menuFoods } from "@/lib/menu-data";
 import { MenuItem } from "@/lib/models/menu-item";
 
-export async function ensureMenuSeeded() {
+export async function ensureMenuDatabaseConnected() {
   await connectToDatabase();
-  if ((await MenuItem.estimatedDocumentCount()) === 0) {
-    await MenuItem.insertMany(
-      menuFoods.map((food) => ({
-        ...food,
-        prepTime: food.prepTime ?? 25,
-        image: food.image,
-      })),
-      { ordered: false },
-    );
-  }
 }
 
 export async function getMenuItems() {
-  await ensureMenuSeeded();
+  await ensureMenuDatabaseConnected();
   return MenuItem.find().sort({ createdAt: 1 }).lean();
 }
 

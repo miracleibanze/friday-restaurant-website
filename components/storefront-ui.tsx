@@ -466,9 +466,7 @@ export function FoodCard({
         href={`/food/${food.slug}`}
         className="relative block aspect-[4/3] overflow-hidden bg-stone-100"
       >
-        <Image
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        <img
           src={food.image}
           alt={displayFoodName(food.name)}
           className="size-full object-cover transition duration-700 group-hover:scale-105"

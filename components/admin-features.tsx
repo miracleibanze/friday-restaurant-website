@@ -1,10 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 import { money } from "@/components/storefront-ui";
 import type { Food } from "@/lib/menu-data";
 import { displayFoodName } from "@/lib/accompaniments";
-import { X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 
 type Section = "menu" | "payments" | "inbox" | "reports" | "customers";
 type MenuForm = {
@@ -29,6 +35,29 @@ const emptyMenuForm: MenuForm = {
 };
 const inputClass =
   "w-full rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-orange-500";
+const maxMenuImageSize = 5 * 1024 * 1024;
+const allowedMenuImageTypes = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+
+function readImageAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result !== "string") {
+        reject(new Error("Could not read the selected image."));
+        return;
+      }
+      resolve(reader.result);
+    };
+    reader.onerror = () =>
+      reject(reader.error ?? new Error("Could not read the selected image."));
+    reader.readAsDataURL(file);
+  });
+}
 
 async function requestJson(url: string, init?: RequestInit) {
   const response = await fetch(url, init);
@@ -83,6 +112,8 @@ function MenuManagement() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+  const [imageReading, setImageReading] = useState(false);
+  const [deletingId, setDeletingId] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -103,8 +134,36 @@ function MenuManagement() {
     void load();
   }, [load]);
 
+  async function selectImage(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    if (!file) return;
+    if (!allowedMenuImageTypes.has(file.type)) {
+      setError("Choose a JPG, PNG, WEBP, or GIF image.");
+      return;
+    }
+    if (file.size === 0 || file.size > maxMenuImageSize) {
+      setError("Image must be no larger than 5 MB.");
+      return;
+    }
+
+    setError("");
+    setImageReading(true);
+    try {
+      const image = await readImageAsDataUrl(file);
+      setForm((current) => ({ ...current, image }));
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "Could not read the image.",
+      );
+    } finally {
+      setImageReading(false);
+    }
+  }
+
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (imageReading) return;
     setSaving(true);
     setError("");
     const body = {
@@ -152,7 +211,7 @@ function MenuManagement() {
   }
 
   function closeForm() {
-    if (saving) return;
+    if (saving || imageReading) return;
     setForm(emptyMenuForm);
     setError("");
     setFormOpen(false);
@@ -179,6 +238,31 @@ function MenuManagement() {
           ? cause.message
           : "Could not update availability.",
       );
+    }
+  }
+
+  async function deleteItem(item: Food) {
+    if (
+      !window.confirm(
+        `Permanently delete "${displayFoodName(item.name)}" from the menu?`,
+      )
+    ) {
+      return;
+    }
+
+    setDeletingId(item.id);
+    setError("");
+    try {
+      await requestJson(`/api/admin/menu?id=${encodeURIComponent(item.id)}`, {
+        method: "DELETE",
+      });
+      await load();
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "Could not delete menu item.",
+      );
+    } finally {
+      setDeletingId("");
     }
   }
 
@@ -225,7 +309,7 @@ function MenuManagement() {
               <button
                 type="button"
                 onClick={closeForm}
-                disabled={saving}
+                disabled={saving || imageReading}
                 aria-label="Close menu item form"
                 className="rounded-full bg-stone-100 p-2 hover:bg-stone-200 disabled:opacity-50"
               >
@@ -286,19 +370,37 @@ function MenuManagement() {
                 />
               </label>
               <label className="text-sm font-semibold sm:col-span-2">
-                Image URL or site path
+                Dish image
                 <input
                   className={`${inputClass} mt-1`}
-                  value={form.image}
-                  required
-                  disabled={true}
-                  maxLength={1000}
-                  placeholder="/dish.jpg"
-                  onChange={(event) =>
-                    setForm({ ...form, image: event.target.value })
-                  }
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={selectImage}
+                  disabled={saving || imageReading}
                 />
+                <span className="mt-1 block text-xs font-normal text-stone-500">
+                  JPG, PNG, WEBP, or GIF. Maximum file size: 5 MB.
+                </span>
               </label>
+              {form.image && (
+                <div className="flex items-center gap-4 sm:col-span-2">
+                  <img
+                    src={form.image}
+                    alt="Menu item preview"
+                    className="size-24 rounded-xl bg-stone-100 object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setForm((current) => ({ ...current, image: "" }))
+                    }
+                    disabled={saving || imageReading}
+                    className="rounded-full border border-stone-200 px-4 py-2 text-sm font-bold disabled:opacity-50"
+                  >
+                    Remove image
+                  </button>
+                </div>
+              )}
               <label className="text-sm font-semibold sm:col-span-2">
                 Description
                 <textarea
@@ -323,15 +425,21 @@ function MenuManagement() {
               </label>
               <div className="flex flex-wrap gap-2 sm:col-span-2">
                 <button
-                  disabled={saving}
+                  disabled={saving || imageReading || !form.image}
                   className="rounded-full bg-charcoal px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50"
                 >
-                  {saving ? "Saving…" : form.id ? "Save changes" : "Add dish"}
+                  {saving
+                    ? "Saving…"
+                    : imageReading
+                      ? "Reading image…"
+                      : form.id
+                        ? "Save changes"
+                        : "Add dish"}
                 </button>
                 <button
                   type="button"
                   onClick={closeForm}
-                  disabled={saving}
+                  disabled={saving || imageReading}
                   className="rounded-full border px-5 py-2.5 text-sm font-bold disabled:opacity-50"
                 >
                   Cancel
@@ -372,9 +480,20 @@ function MenuManagement() {
                 <button
                   type="button"
                   onClick={() => void toggleAvailability(item)}
+                  disabled={deletingId === item.id}
                   className={`rounded-lg border px-3 py-2 text-sm font-bold ${item.available ? "bg-red-400 text-white hover:bg-red-500" : "bg-green-400 text-white hover:bg-green-500"}`}
                 >
                   {item.available ? "Disable" : "Enable"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void deleteItem(item)}
+                  disabled={deletingId === item.id}
+                  aria-label={`Delete ${displayFoodName(item.name)}`}
+                  className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-2 text-sm font-bold text-red-700 hover:bg-red-50 disabled:opacity-50"
+                >
+                  <Trash2 size={15} />
+                  {deletingId === item.id ? "Deleting…" : "Delete"}
                 </button>
               </div>
             </article>

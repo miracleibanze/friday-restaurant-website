@@ -9,7 +9,6 @@ import {
 } from "@/components/storefront-ui";
 import { PageLoader } from "@/app/loading";
 import { displayFoodName } from "@/lib/accompaniments";
-import { menuFoods } from "@/lib/menu-data";
 import { Check, Clock3, Minus, Plus, Star } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -28,10 +27,9 @@ interface FoodDetailsProps {
 }
 
 export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
-  const [food, setFood] = useState<Food | null>(
-    () => menuFoods.find((item) => item.slug === slug) ?? null,
-  );
+  const [food, setFood] = useState<Food | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const add = useAddFood();
   const [quantity, setQuantity] = useState(1);
   const [accompaniments, setAccompaniments] = useState<Accompaniments>({
@@ -47,20 +45,51 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
   );
   useEffect(() => {
     const controller = new AbortController();
-    fetch("/api/menu", { signal: controller.signal })
-      .then(async (response) => {
+    let active = true;
+
+    async function loadFood() {
+      try {
+        const response = await fetch("/api/menu", {
+          signal: controller.signal,
+        });
         const result = await response.json();
-        if (!response.ok) throw new Error(result.error || "Could not load menu.");
-        setFood(result.items.find((item: Food) => item.slug === slug) ?? null);
-      })
-      .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === "AbortError") return;
+        if (!response.ok) {
+          throw new Error(result.error || "Could not load menu.");
+        }
+        if (!Array.isArray(result.items)) {
+          throw new Error("The menu response is invalid.");
+        }
+        if (active) {
+          setFood(
+            result.items.find((item: Food) => item.slug === slug) ?? null,
+          );
+        }
+      } catch (error: unknown) {
+        if (!active || (error instanceof DOMException && error.name === "AbortError")) {
+          return;
+        }
         console.error("Could not load menu item.", error);
-      })
-      .finally(() => setLoading(false));
-    return () => controller.abort();
+        setLoadError("Could not load this menu item. Please try again.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    void loadFood();
+    return () => {
+      active = false;
+      controller.abort();
+    };
   }, [slug]);
   if (loading) return <PageLoader label="Loading menu item…" />;
+  if (loadError)
+    return (
+      <main className="shell grid min-h-[50vh] place-items-center py-12">
+        <p role="alert" className="text-center text-stone-600">
+          {loadError}
+        </p>
+      </main>
+    );
   if (!food)
     return (
       <EmptyState
