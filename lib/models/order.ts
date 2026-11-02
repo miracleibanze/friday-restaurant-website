@@ -6,6 +6,7 @@ import {
   type HydratedDocument,
   type Model,
 } from "mongoose";
+import type { Accompaniments } from "@/lib/accompaniments";
 
 export const orderStatuses = [
   "confirmed",
@@ -24,6 +25,7 @@ export interface OrderItemFields {
   name: string;
   price: number;
   quantity: number;
+  accompaniments: Accompaniments;
 }
 
 export interface OrderFields {
@@ -62,6 +64,11 @@ const orderSchema = new Schema<OrderFields>(
         name: { type: String, required: true },
         price: { type: Number, required: true, min: 0 },
         quantity: { type: Number, required: true, min: 1, max: 20 },
+        accompaniments: {
+          chips: { type: Number, min: 0, max: 4, default: 0 },
+          samosa: { type: Number, min: 0, max: 4, default: 0 },
+          pilau: { type: Number, min: 0, max: 4, default: 0 },
+        },
       },
     ],
     subtotal: { type: Number, required: true, min: 0 },

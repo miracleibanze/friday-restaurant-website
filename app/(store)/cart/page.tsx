@@ -10,6 +10,7 @@ import {
 } from "@/components/storefront-ui";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { removeFromCart, updateCartItem } from "@/lib/store/store";
+import { displayFoodName } from "@/lib/accompaniments";
 import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 
@@ -36,7 +37,7 @@ export default function CartPage() {
       <SectionTitle eyebrow="Your order" title="Good choices." />
       <div className="grid gap-10 lg:grid-cols-[1fr_380px]">
         <div className="space-y-4">
-          {cart.map(({ food, quantity }) => (
+          {cart.map(({ food, quantity, accompaniments }) => (
             <div
               key={food.id}
               className="flex gap-4 rounded-3xl bg-white p-4 soft-ring"
@@ -44,7 +45,7 @@ export default function CartPage() {
               <div className="size-28 shrink-0 overflow-hidden rounded-2xl bg-stone-100">
                 <img
                   src={food.image}
-                  alt={food.name}
+                  alt={displayFoodName(food.name)}
                   className="size-full object-cover"
                 />
               </div>
@@ -55,10 +56,17 @@ export default function CartPage() {
                       href={`/food/${food.slug}`}
                       className="font-display text-lg"
                     >
-                      {food.name}
+                      {displayFoodName(food.name)}
                     </Link>
                     <p className="mt-1 text-sm text-stone-500">
                       {money(food.price)}
+                    </p>
+                    <p className="mt-1 text-xs capitalize text-stone-500">
+                      Accompaniments:{" "}
+                      {Object.entries(accompaniments)
+                        .filter(([, count]) => count > 0)
+                        .map(([name, count]) => `${count} ${name}`)
+                        .join(", ") || "none"}
                     </p>
                   </div>
                   <button
@@ -83,7 +91,7 @@ export default function CartPage() {
                         )
                       }
                       className="p-2.5"
-                      aria-label={`Remove one ${food.name}`}
+                      aria-label={`Remove one ${displayFoodName(food.name)}`}
                     >
                       <Minus size={14} />
                     </button>
@@ -101,7 +109,7 @@ export default function CartPage() {
                         )
                       }
                       className="p-2.5"
-                      aria-label={`Add one ${food.name}`}
+                      aria-label={`Add one ${displayFoodName(food.name)}`}
                     >
                       <Plus size={14} />
                     </button>

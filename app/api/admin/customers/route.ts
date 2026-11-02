@@ -4,6 +4,7 @@ import { connectToDatabase } from "@/lib/db";
 import { Order } from "@/lib/models/order";
 import { User } from "@/lib/models/user";
 import { getSession } from "@/lib/session";
+import { displayFoodName } from "@/lib/accompaniments";
 
 export async function GET(request: NextRequest) {
   try {
@@ -53,7 +54,7 @@ export async function GET(request: NextRequest) {
           paymentStatus: order.paymentStatus ?? "pending",
           total: order.total,
           createdAt: order.createdAt.toISOString(),
-          items: order.items.map((item) => `${item.quantity} × ${item.name}`),
+          items: order.items.map((item) => `${item.quantity} × ${displayFoodName(item.name)}`),
         })),
         total,
         page,

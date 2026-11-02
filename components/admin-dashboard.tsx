@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { StoreHeader } from "@/components/storefront-ui";
 import AdminFeatures from "@/components/admin-features";
+import { displayFoodName } from "@/lib/accompaniments";
 
 type OrderStatus =
   | "confirmed"
@@ -30,7 +31,13 @@ type Order = {
   phone: string;
   deliveryAddress: string;
   notes: string;
-  items: Array<{ food: string; name: string; price: number; quantity: number }>;
+  items: Array<{
+    food: string;
+    name: string;
+    price: number;
+    quantity: number;
+    accompaniments: { chips: number; samosa: number; pilau: number };
+  }>;
   subtotal: number;
   deliveryFee: number;
   total: number;
@@ -390,7 +397,7 @@ export default function AdminDashboard() {
         </nav>
         {activeSection === "orders" ? (
           <>
-            <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
               <Metric
                 title="All orders"
                 value={allOrdersTotal}
@@ -410,6 +417,11 @@ export default function AdminDashboard() {
                 title="On the way"
                 value={counts["on-the-way"] || 0}
                 icon={<ArrowDownToLine size={18} />}
+              />
+              <Metric
+                title="Delivered"
+                value={counts.delivered || 0}
+                icon={<ShoppingBag size={18} />}
               />
             </section>
 
@@ -524,6 +536,17 @@ export default function AdminDashboard() {
                         </span>
 
                         <div className="flex items-center gap-2">
+                          {order.status !== "delivered" &&
+                            order.status !== "cancelled" && (
+                              <button
+                                type="button"
+                                disabled={updatingId === order.id}
+                                onClick={() => void changeStatus(order, "delivered")}
+                                className="rounded-xl bg-green-700 px-3 py-2 text-sm font-bold text-white transition hover:bg-green-800 disabled:opacity-50"
+                              >
+                                Mark delivered
+                              </button>
+                            )}
                           <select
                             aria-label={`Update ${order.orderNumber} status`}
                             className="max-w-40 rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm font-semibold"
@@ -747,7 +770,16 @@ function OrderModal({
               className="flex justify-between gap-3 py-3 text-sm"
             >
               <span>
-                {item.quantity} × {item.name}
+                {item.quantity} × {displayFoodName(item.name)}
+                {item.accompaniments &&
+                  Object.values(item.accompaniments).some((count) => count > 0) && (
+                    <span className="block text-xs capitalize text-stone-500">
+                      {Object.entries(item.accompaniments)
+                        .filter(([, count]) => count > 0)
+                        .map(([name, count]) => `${count} ${name}`)
+                        .join(", ")}
+                    </span>
+                  )}
               </span>
               <span className="font-semibold">
                 {money(item.price * item.quantity)}

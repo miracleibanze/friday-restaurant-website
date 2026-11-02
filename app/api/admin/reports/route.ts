@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { Order } from "@/lib/models/order";
 import { getSession } from "@/lib/session";
+import { displayFoodName } from "@/lib/accompaniments";
 
 export async function GET(request: NextRequest) {
   try {
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
       summary: summary ?? { orders: 0, cancelledOrders: 0, paidRevenue: 0, paidOrders: 0, pendingPayments: 0 },
       bestSellers: bestSellers.map((item) => ({
         id: item._id,
-        name: item.name,
+        name: displayFoodName(item.name),
         quantity: item.quantity,
         sales: item.sales,
       })),

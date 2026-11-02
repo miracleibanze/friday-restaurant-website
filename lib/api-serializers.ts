@@ -1,5 +1,6 @@
 import type { OrderDocument } from "@/lib/models/order";
 import type { UserDocument } from "@/lib/models/user";
+import { displayFoodName } from "@/lib/accompaniments";
 
 export function serializeUser(user: UserDocument) {
   return {
@@ -23,9 +24,14 @@ export function serializeOrder(order: OrderDocument) {
     deliveryAddress: order.deliveryAddress,
     items: order.items.map((item) => ({
       food: item.food,
-      name: item.name,
+      name: displayFoodName(item.name),
       price: item.price,
       quantity: item.quantity,
+      accompaniments: {
+        chips: item.accompaniments?.chips ?? 0,
+        samosa: item.accompaniments?.samosa ?? 0,
+        pilau: item.accompaniments?.pilau ?? 0,
+      },
     })),
     subtotal: order.subtotal,
     deliveryFee: order.deliveryFee,

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { money } from "@/components/storefront-ui";
 import type { Food } from "@/lib/menu-data";
+import { displayFoodName } from "@/lib/accompaniments";
 import { X } from "lucide-react";
 
 type Section = "menu" | "payments" | "inbox" | "reports" | "customers";
@@ -351,7 +352,7 @@ function MenuManagement() {
             >
               <div className="min-w-0">
                 <p className="font-bold">
-                  {item.name}{" "}
+                  {displayFoodName(item.name)}{" "}
                   <span className="ml-2 rounded-full bg-stone-100 px-2 py-1 text-xs font-semibold text-stone-600">
                     {item.available ? "Available" : "Unavailable"}
                   </span>

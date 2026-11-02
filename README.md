@@ -41,6 +41,7 @@ All APIs are implemented as Next.js Route Handlers under `app/api`:
 - `PATCH /api/auth` — update signed-in customer profile.
 - `DELETE /api/auth` — sign out.
 - `POST /api/orders` — create an order. Guests may order too; signed-in customer orders are linked to their MongoDB user record.
+- Order items may include `accompaniments` counts for chips, samosa, and pilau; no more than four accompaniments may be selected across one order.
 - `GET /api/orders` — list the signed-in customer's orders.
 - `GET /api/orders?orderNumber=FR-...` — public order status lookup (does not disclose delivery address or customer contact details).
 - `GET /api/admin/orders` — admin-only paginated order list. Supports `status`, `search`, `page` (1-based), and `pageSize` (`10`, `20`, `50`, or `100`) query parameters. Returns the filtered `total`, current `page`, `pageSize`, and `pages` alongside the orders; status counts remain global.
@@ -53,7 +54,7 @@ All APIs are implemented as Next.js Route Handlers under `app/api`:
 - `GET /api/admin/reports?days=7|30|90` — admin-only paid-revenue, order, payment, and best-seller report.
 - `GET /api/admin/customers` — admin-only registered customer list with order summaries; supports `search` and `page`.
 
-The admin dashboard is at `/admin`. It polls for new orders every 15 seconds and can search, filter, inspect, and update orders. It also supports menu management, manual payment reconciliation, contact-message management, sales reports, and registered-customer summaries.
+The admin dashboard is at `/admin`. It polls for new orders every 15 seconds and can search, filter, inspect, update order statuses, and explicitly mark orders as delivered. It also supports menu management, manual payment reconciliation, contact-message management, sales reports, and registered-customer summaries.
 
 Passwords are hashed server-side and login sessions use signed, `HttpOnly` cookies. Use HTTPS in production. Order prices and totals are recalculated from the server menu catalog; the browser's submitted prices are not trusted.
 

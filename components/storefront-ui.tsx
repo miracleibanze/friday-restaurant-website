@@ -23,6 +23,15 @@ import {
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { addToCart, type Order } from "@/lib/store/store";
 import type { Food } from "@/lib/menu-data";
+import {
+  accompanimentTotal,
+  accompanimentTypes,
+  displayFoodName,
+  emptyAccompaniments,
+  maxAccompaniments,
+  type Accompaniments,
+  type AccompanimentType,
+} from "@/lib/accompaniments";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
@@ -49,7 +58,59 @@ export function PageLoader({ label }: { label: string }) {
 
 export function useAddFood() {
   const dispatch = useAppDispatch();
-  return (food: Food, quantity = 1) => dispatch(addToCart({ food, quantity }));
+  return (
+    food: Food,
+    quantity = 1,
+    accompaniments: Accompaniments = emptyAccompaniments,
+  ) => dispatch(addToCart({ food, quantity, accompaniments }));
+}
+
+export function AccompanimentSelector({
+  value,
+  onChange,
+  maxTotal = maxAccompaniments,
+}: {
+  value: Accompaniments;
+  onChange: (value: Accompaniments) => void;
+  maxTotal?: number;
+}) {
+  const selectedTotal = accompanimentTotal(value);
+  return (
+    <fieldset className="mt-4">
+      <legend className="text-sm font-bold">Choose accompaniments (up to 4)</legend>
+      <div className="mt-2 grid grid-cols-3 gap-2">
+        {accompanimentTypes.map((type: AccompanimentType) => {
+          const otherCount = selectedTotal - value[type];
+          const highestCount = Math.max(0, Math.min(4, maxTotal - otherCount));
+          return (
+            <label key={type} className="text-xs font-semibold capitalize text-stone-600">
+              {type}
+              <select
+                aria-label={`${type} accompaniment count`}
+                className="mt-1 w-full rounded-lg border border-stone-200 bg-white px-2 py-2 text-sm"
+                value={value[type]}
+                onChange={(event) =>
+                  onChange({
+                    ...value,
+                    [type]: Math.min(Number(event.target.value), highestCount),
+                  })
+                }
+              >
+                {Array.from({ length: highestCount + 1 }, (_, count) => (
+                  <option key={count} value={count}>
+                    {count}
+                  </option>
+                ))}
+              </select>
+            </label>
+          );
+        })}
+      </div>
+      <p className="mt-1 text-xs text-stone-500">
+        {selectedTotal} of {maxTotal} selected
+      </p>
+    </fieldset>
+  );
 }
 
 export function Logo() {
@@ -88,7 +149,7 @@ export function StoreHeader({ minimal = false }: { minimal?: boolean }) {
 
   const links = [
     ["Home", "/"],
-    ["Meals", "/#products"],
+    ["Menu", "/#products"],
     ["About", "/#about"],
     ["Contact", "/contact"],
   ];
@@ -174,7 +235,7 @@ export function StoreHeader({ minimal = false }: { minimal?: boolean }) {
                       >
                         <div className="flex-1">
                           <h4 className="text-[18px] font-semibold leading-none">
-                            {item.food.name}
+                            {displayFoodName(item.food.name)}
                           </h4>
                         </div>
                         <span className="text-[12px] bg-black text-white rounded-full p-1 h-5 w-5 flex-0 flex items-center justify-center aspect-square">
@@ -250,7 +311,7 @@ export function StoreFooter() {
         <div>
           <p className="font-display text-lg">Explore</p>
           <div className="mt-5 flex flex-col gap-3 text-sm text-stone-300">
-            <Link href="/#products">Our Meals</Link>
+            <Link href="/#products">Our Menu</Link>
             <Link href="/order-tracking">Track an order</Link>
             <Link href="/faq">FAQs</Link>
           </div>
@@ -360,8 +421,21 @@ export function FoodCard({
   add,
 }: {
   food: Food;
-  add: (food: Food) => void;
+  add: (
+    food: Food,
+    quantity?: number,
+    accompaniments?: Accompaniments,
+  ) => void;
 }) {
+  const [accompaniments, setAccompaniments] = useState<Accompaniments>({
+    ...emptyAccompaniments,
+  });
+  const cart = useAppSelector((state) => state.app.cart);
+  const alreadySelected = cart.reduce(
+    (total, item) => total + accompanimentTotal(item.accompaniments),
+    0,
+  );
+  const remaining = Math.max(0, maxAccompaniments - alreadySelected);
   return (
     <article
       className="food-shadow group overflow-hidden rounded-[1.75rem] bg-white sm:
@@ -375,7 +449,7 @@ export function FoodCard({
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           src={food.image}
-          alt={food.name}
+          alt={displayFoodName(food.name)}
           className="size-full object-cover transition duration-700 group-hover:scale-105"
         />
         <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold backdrop-blur">
@@ -394,7 +468,7 @@ export function FoodCard({
               href={`/food/${food.slug}`}
               className="text-xl font-bold leading-tight transition hover:text-friday"
             >
-              {food.name}
+              {displayFoodName(food.name)}
             </Link>
             <p className="mt-2 line-clamp-2 text-sm leading-tight text-stone-500">
               {food.description}
@@ -405,14 +479,22 @@ export function FoodCard({
             {food.rating}
           </span>
         </div>
+        <AccompanimentSelector
+        value={accompaniments}
+        onChange={setAccompaniments}
+        maxTotal={remaining}
+        />
         <div className="mt-5 flex items-center justify-between">
           <span className="font-bold text-lg">{money(food.price)}</span>
           <button
             type="button"
             disabled={!food.available}
-            onClick={() => add(food)}
+            onClick={() => {
+              add(food, 1, accompaniments);
+              setAccompaniments({ ...emptyAccompaniments });
+            }}
             className="bg-charcoal flex size-11 items-center justify-center rounded-full text-white transition hover:rotate-6 hover:bg-friday disabled:opacity-30"
-            aria-label={`Add ${food.name} to cart`}
+            aria-label={`Add ${displayFoodName(food.name)} to cart`}
           >
             <Plus size={19} />
           </button>

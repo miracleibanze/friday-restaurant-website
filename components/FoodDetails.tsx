@@ -5,7 +5,9 @@ import {
   EmptyState,
   money,
   useAddFood,
+  AccompanimentSelector,
 } from "@/components/storefront-ui";
+import { displayFoodName } from "@/lib/accompaniments";
 import { menuFoods } from "@/lib/menu-data";
 import { Check, Clock3, Minus, Plus, Star } from "lucide-react";
 import Link from "next/link";
@@ -13,6 +15,13 @@ import { useState } from "react";
 import { useEffect } from "react";
 import type { Food } from "@/lib/menu-data";
 import { PageLoader } from "@/components/storefront-ui";
+import {
+  accompanimentTotal,
+  emptyAccompaniments,
+  maxAccompaniments,
+  type Accompaniments,
+} from "@/lib/accompaniments";
+import { useAppSelector } from "@/lib/store/hooks";
 
 interface FoodDetailsProps {
   slug: string;
@@ -25,6 +34,15 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
   const [loading, setLoading] = useState(true);
   const add = useAddFood();
   const [quantity, setQuantity] = useState(1);
+  const [accompaniments, setAccompaniments] = useState<Accompaniments>({
+    ...emptyAccompaniments,
+  });
+  const cart = useAppSelector((state) => state.app.cart);
+  const alreadySelected = cart.reduce(
+    (total, item) => total + accompanimentTotal(item.accompaniments),
+    0,
+  );
+  const remaining = Math.max(0, maxAccompaniments - alreadySelected);
   useEffect(() => {
     const controller = new AbortController();
     fetch("/api/menu", { signal: controller.signal })
@@ -62,7 +80,7 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
         <div className="relative aspect-square overflow-hidden rounded-[2.5rem] bg-white food-shadow">
           <img
             src={food.image}
-            alt={food.name}
+            alt={displayFoodName(food.name)}
             className="size-full object-cover"
           />
         </div>
@@ -71,7 +89,7 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
             {food.category?.name}
           </span>
           <h1 className="font-display mt-4 text-5xl leading-tight md:text-6xl font-light!">
-            {food.name}
+            {displayFoodName(food.name)}
           </h1>
           <div className="mt-5 flex gap-5 text-sm text-stone-500">
             <span className="flex items-center gap-1.5">
@@ -92,6 +110,11 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
               Freshly prepared · Delivery available
             </p>
           </div>
+          <AccompanimentSelector
+            value={accompaniments}
+            onChange={setAccompaniments}
+            maxTotal={remaining}
+          />
           <div className="mt-8 flex flex-wrap gap-4">
             <div className="flex items-center rounded-full border border-stone-200 bg-white p-1">
               <button
@@ -112,7 +135,10 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
             </div>
             <button
               type="button"
-              onClick={() => add(food, quantity)}
+              onClick={() => {
+                add(food, quantity, accompaniments);
+                setAccompaniments({ ...emptyAccompaniments });
+              }}
               disabled={!food.available}
               className={`${buttonClass} flex-1`}
             >

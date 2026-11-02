@@ -30,7 +30,7 @@ const meals: Array<{
   calories?: number;
 }> = [
   {
-    name: "Full Chicken",
+    name: "Friday Full Chicken",
     slug: "full-chicken",
     description: "A whole chicken served with 2 chips, 2 pilau, and 3 samosas.",
     price: 21000,
@@ -38,7 +38,7 @@ const meals: Array<{
     calories: 680,
   },
   {
-    name: "Full Fish",
+    name: "Friday Full Fish",
     slug: "full-fish",
     description: "A whole fish served with 2 chips.",
     price: 16000,
@@ -46,7 +46,7 @@ const meals: Array<{
     calories: 720,
   },
   {
-    name: "Half Chicken",
+    name: "Friday Half Chicken",
     slug: "half-chicken",
     description:
       "Half a chicken served with your choice of 2 chips or 2 pilau.",
@@ -54,28 +54,28 @@ const meals: Array<{
     image: "/Half-Chicken.jpg",
   },
   {
-    name: "Chicken Wings",
+    name: "Friday Chicken Wings",
     slug: "chicken-wings",
     description: "Chicken wings served with 1 portion of chips.",
     price: 7000,
     image: "/Chicken-Wings.jpg",
   },
   {
-    name: "Chicken Leg",
+    name: "Friday Chicken Leg",
     slug: "chicken-leg",
     description: "A chicken leg served with 1 portion of chips.",
     price: 7000,
     image: "/Chicken-Legs.jpg",
   },
   {
-    name: "Chicken Burger",
+    name: "Friday Chicken Burger",
     slug: "chicken-burger",
     description: "A chicken burger served with 1 portion of chips.",
     price: 7000,
     image: "/Chicken-Burger.jpg",
   },
   {
-    name: "Beef Burger",
+    name: "Friday Beef Burger",
     slug: "beef-burger",
     description: "A beef burger served with 1 portion of chips.",
     price: 7000,

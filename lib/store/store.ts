@@ -5,8 +5,18 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import type { Food } from "@/lib/menu-data";
+import {
+  accompanimentTotal,
+  emptyAccompaniments,
+  maxAccompaniments,
+  type Accompaniments,
+} from "@/lib/accompaniments";
 
-export type CartItem = { food: Food; quantity: number };
+export type CartItem = {
+  food: Food;
+  quantity: number;
+  accompaniments: Accompaniments;
+};
 export type Customer = {
   id: string;
   name: string;
@@ -24,7 +34,13 @@ export type Order = {
   email: string;
   phone: string;
   deliveryAddress: string;
-  items: Array<{ food: string; name: string; price: number; quantity: number }>;
+  items: Array<{
+    food: string;
+    name: string;
+    price: number;
+    quantity: number;
+    accompaniments: Accompaniments;
+  }>;
   subtotal: number;
   deliveryFee: number;
   total: number;
@@ -98,7 +114,10 @@ const appSlice = createSlice({
       state,
       action: PayloadAction<{ cart: CartItem[]; lastOrder: Order | null }>,
     ) {
-      state.cart = action.payload.cart;
+      state.cart = action.payload.cart.map((item) => ({
+        ...item,
+        accompaniments: item.accompaniments ?? { ...emptyAccompaniments },
+      }));
       state.lastOrder = action.payload.lastOrder;
       state.initialized = true;
     },
@@ -127,13 +146,36 @@ const appSlice = createSlice({
       state.ordersError = action.payload;
       state.ordersStatus = "error";
     },
-    addToCart(state, action: PayloadAction<{ food: Food; quantity?: number }>) {
+    addToCart(
+      state,
+      action: PayloadAction<{
+        food: Food;
+        quantity?: number;
+        accompaniments?: Accompaniments;
+      }>,
+    ) {
       const quantity = action.payload.quantity ?? 1;
+      const accompaniments = action.payload.accompaniments ?? emptyAccompaniments;
+      const currentTotal = state.cart.reduce(
+        (total, item) => total + accompanimentTotal(item.accompaniments),
+        0,
+      );
+      if (currentTotal + accompanimentTotal(accompaniments) > maxAccompaniments) return;
       const item = state.cart.find(
         ({ food }) => food.id === action.payload.food.id,
       );
-      if (item) item.quantity += quantity;
-      else state.cart.push({ food: action.payload.food, quantity });
+      if (item) {
+        item.quantity += quantity;
+        for (const type of Object.keys(accompaniments) as Array<keyof Accompaniments>) {
+          item.accompaniments[type] += accompaniments[type];
+        }
+      } else {
+        state.cart.push({
+          food: action.payload.food,
+          quantity,
+          accompaniments: { ...accompaniments },
+        });
+      }
     },
     syncMenu(state, action: PayloadAction<Food[]>) {
       const catalog = new Map(action.payload.map((food) => [food.id, food]));
