@@ -7,14 +7,7 @@ import { serializeOrder } from "@/lib/api-serializers";
 import { Order } from "@/lib/models/order";
 import { User } from "@/lib/models/user";
 import { getSession } from "@/lib/session";
-import {
-  accompanimentTotal,
-  accompanimentTypes,
-  displayFoodName,
-  emptyAccompaniments,
-  maxAccompaniments,
-  type Accompaniments,
-} from "@/lib/accompaniments";
+import { displayFoodName } from "@/lib/food-utils";
 
 export async function GET(request: NextRequest) {
   try {
@@ -72,7 +65,6 @@ export async function POST(request: NextRequest) {
     const requestedItems = body.items as Array<{
       food?: unknown;
       quantity?: unknown;
-      accompaniments?: unknown;
     }>;
     const items = [];
     for (const requested of requestedItems) {
@@ -81,33 +73,11 @@ export async function POST(request: NextRequest) {
       }
       const food = menuItems.find((menuItem) => menuItem.id === requested.food && menuItem.available);
       if (!food) return NextResponse.json({ error: "One or more selected menu items are unavailable." }, { status: 400 });
-      const accompaniments = { ...emptyAccompaniments } as Accompaniments;
-      if (requested.accompaniments !== undefined) {
-        if (
-          !requested.accompaniments ||
-          typeof requested.accompaniments !== "object" ||
-          accompanimentTypes.some((type) => {
-            const count = (requested.accompaniments as Record<string, unknown>)[type];
-            return count !== undefined && (!Number.isInteger(count) || Number(count) < 0 || Number(count) > 4);
-          })
-        ) {
-          return NextResponse.json({ error: "One or more accompaniment counts are invalid." }, { status: 400 });
-        }
-        for (const type of accompanimentTypes) {
-          const count = (requested.accompaniments as Partial<Accompaniments>)[type];
-          if (count !== undefined) accompaniments[type] = Number(count);
-        }
-      }
-
-      if (accompanimentTotal(accompaniments) > maxAccompaniments) {
-        return NextResponse.json({ error: "Choose no more than four accompaniments for each menu item." }, { status: 400 });
-      }
       items.push({
         food: food.id,
         name: displayFoodName(food.name),
         price: food.price,
         quantity: Number(requested.quantity),
-        accompaniments,
       });
     }
 

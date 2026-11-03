@@ -9,7 +9,7 @@ import {
 } from "react";
 import { money } from "@/components/storefront-ui";
 import type { Food } from "@/lib/menu-data";
-import { displayFoodName } from "@/lib/accompaniments";
+import { displayFoodName } from "@/lib/food-utils";
 import { Trash2, X } from "lucide-react";
 
 type Section = "menu" | "payments" | "inbox" | "reports" | "customers";
@@ -18,6 +18,7 @@ type MenuForm = {
   name: string;
   slug: string;
   description: string;
+  longDescription: string;
   price: string;
   prepTime: string;
   image: string;
@@ -28,6 +29,7 @@ const emptyMenuForm: MenuForm = {
   name: "",
   slug: "",
   description: "",
+  longDescription: "",
   price: "",
   prepTime: "25",
   image: "",
@@ -195,6 +197,7 @@ function MenuManagement() {
       name: item.name,
       slug: item.slug,
       description: item.description,
+      longDescription: item.longDescription ?? "",
       price: String(item.price),
       prepTime: String(item.prepTime ?? 25),
       image: item.image,
@@ -402,7 +405,7 @@ function MenuManagement() {
                 </div>
               )}
               <label className="text-sm font-semibold sm:col-span-2">
-                Description
+                Card description
                 <textarea
                   className={`${inputClass} mt-1 min-h-24`}
                   value={form.description}
@@ -412,6 +415,20 @@ function MenuManagement() {
                     setForm({ ...form, description: event.target.value })
                   }
                 />
+              </label>
+              <label className="text-sm font-semibold sm:col-span-2">
+                Food page long description
+                <textarea
+                  className={`${inputClass} mt-1 min-h-32`}
+                  value={form.longDescription}
+                  maxLength={5000}
+                  onChange={(event) =>
+                    setForm({ ...form, longDescription: event.target.value })
+                  }
+                />
+                <span className="mt-1 block text-xs font-normal text-stone-500">
+                  Optional. If left blank, the card description is shown on the food page.
+                </span>
               </label>
               <label className="flex items-center gap-2 text-sm font-semibold">
                 <input

@@ -5,17 +5,10 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import type { Food } from "@/lib/menu-data";
-import {
-  accompanimentTotal,
-  emptyAccompaniments,
-  maxAccompaniments,
-  type Accompaniments,
-} from "@/lib/accompaniments";
 
 export type CartItem = {
   food: Food;
   quantity: number;
-  accompaniments: Accompaniments;
 };
 export type Customer = {
   id: string;
@@ -39,7 +32,6 @@ export type Order = {
     name: string;
     price: number;
     quantity: number;
-    accompaniments: Accompaniments;
   }>;
   subtotal: number;
   deliveryFee: number;
@@ -114,9 +106,9 @@ const appSlice = createSlice({
       state,
       action: PayloadAction<{ cart: CartItem[]; lastOrder: Order | null }>,
     ) {
-      state.cart = action.payload.cart.map((item) => ({
-        ...item,
-        accompaniments: item.accompaniments ?? { ...emptyAccompaniments },
+      state.cart = action.payload.cart.map(({ food, quantity }) => ({
+        food,
+        quantity,
       }));
       state.lastOrder = action.payload.lastOrder;
       state.initialized = true;
@@ -151,31 +143,18 @@ const appSlice = createSlice({
       action: PayloadAction<{
         food: Food;
         quantity?: number;
-        accompaniments?: Accompaniments;
       }>,
     ) {
       const quantity = action.payload.quantity ?? 1;
-      const accompaniments = action.payload.accompaniments ?? emptyAccompaniments;
       const item = state.cart.find(
         ({ food }) => food.id === action.payload.food.id,
       );
       if (item) {
-        if (
-          accompanimentTotal(item.accompaniments) +
-            accompanimentTotal(accompaniments) >
-          maxAccompaniments
-        ) {
-          return;
-        }
         item.quantity += quantity;
-        for (const type of Object.keys(accompaniments) as Array<keyof Accompaniments>) {
-          item.accompaniments[type] += accompaniments[type];
-        }
       } else {
         state.cart.push({
           food: action.payload.food,
           quantity,
-          accompaniments: { ...accompaniments },
         });
       }
     },

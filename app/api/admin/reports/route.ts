@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { Order } from "@/lib/models/order";
 import { getSession } from "@/lib/session";
-import { displayFoodName } from "@/lib/accompaniments";
+import { displayFoodName } from "@/lib/food-utils";
 
 export async function GET(request: NextRequest) {
   try {

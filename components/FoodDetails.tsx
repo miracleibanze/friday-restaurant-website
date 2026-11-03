@@ -5,22 +5,14 @@ import {
   EmptyState,
   money,
   useAddFood,
-  AccompanimentSelector,
 } from "@/components/storefront-ui";
 import { PageLoader } from "@/app/loading";
-import { displayFoodName } from "@/lib/accompaniments";
+import { displayFoodName } from "@/lib/food-utils";
 import { Check, Clock3, Minus, Plus, Star } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useEffect } from "react";
 import type { Food } from "@/lib/menu-data";
-import {
-  accompanimentTotal,
-  emptyAccompaniments,
-  maxAccompaniments,
-  type Accompaniments,
-} from "@/lib/accompaniments";
-import { useAppSelector } from "@/lib/store/hooks";
 
 interface FoodDetailsProps {
   slug: string;
@@ -32,17 +24,6 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
   const [loadError, setLoadError] = useState("");
   const add = useAddFood();
   const [quantity, setQuantity] = useState(1);
-  const [accompaniments, setAccompaniments] = useState<Accompaniments>({
-    ...emptyAccompaniments,
-  });
-  const cart = useAppSelector((state) => state.app.cart);
-  const selectedForFood = cart.find(
-    (item) => item.food.id === food?.id,
-  )?.accompaniments;
-  const remaining = Math.max(
-    0,
-    maxAccompaniments - accompanimentTotal(selectedForFood),
-  );
   useEffect(() => {
     const controller = new AbortController();
     let active = true;
@@ -132,20 +113,23 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
             </span>
             <span>{food.calories} kcal</span>
           </div>
-          <p className="mt-7 text-lg leading-8 text-stone-600">
-            {food.description}
-          </p>
+          <section className="mt-7" aria-labelledby="food-description-title">
+            <h2
+              id="food-description-title"
+              className="font-display text-2xl"
+            >
+              About this dish
+            </h2>
+            <p className="mt-3 text-lg leading-8 text-stone-600">
+              {food.longDescription}
+            </p>
+          </section>
           <div className="mt-8 border-y border-stone-200 py-7">
             <p className="font-display text-3xl">{money(food.price)}</p>
             <p className="mt-1 text-sm text-stone-500">
               Freshly prepared · Delivery available
             </p>
           </div>
-          <AccompanimentSelector
-            value={accompaniments}
-            onChange={setAccompaniments}
-            maxTotal={remaining}
-          />
           <div className="mt-8 flex flex-wrap gap-4">
             <div className="flex items-center rounded-full border border-stone-200 bg-white p-1">
               <button
@@ -166,10 +150,7 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
             </div>
             <button
               type="button"
-              onClick={() => {
-                add(food, quantity, accompaniments);
-                setAccompaniments({ ...emptyAccompaniments });
-              }}
+              onClick={() => add(food, quantity)}
               disabled={!food.available}
               className={`${buttonClass} flex-1`}
             >

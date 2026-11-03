@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { StoreHeader } from "@/components/storefront-ui";
 import AdminFeatures from "@/components/admin-features";
-import { displayFoodName } from "@/lib/accompaniments";
+import { displayFoodName } from "@/lib/food-utils";
 
 type OrderStatus =
   | "confirmed"
@@ -36,7 +36,6 @@ type Order = {
     name: string;
     price: number;
     quantity: number;
-    accompaniments: { chips: number; samosa: number; pilau: number };
   }>;
   subtotal: number;
   deliveryFee: number;
@@ -761,15 +760,6 @@ function OrderModal({
             >
               <span>
                 {item.quantity} × {displayFoodName(item.name)}
-                {item.accompaniments &&
-                  Object.values(item.accompaniments).some((count) => count > 0) && (
-                    <span className="block text-xs capitalize text-stone-500">
-                      {Object.entries(item.accompaniments)
-                        .filter(([, count]) => count > 0)
-                        .map(([name, count]) => `${count} ${name}`)
-                        .join(", ")}
-                    </span>
-                  )}
               </span>
               <span className="font-semibold">
                 {money(item.price * item.quantity)}

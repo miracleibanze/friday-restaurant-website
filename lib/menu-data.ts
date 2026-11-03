@@ -11,6 +11,7 @@ export type Food = {
   name: string;
   slug: string;
   description: string;
+  longDescription?: string;
   price: number;
   available: boolean;
   prepTime?: number;

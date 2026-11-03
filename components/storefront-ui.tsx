@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import {
   Camera,
   ChevronUp,
@@ -23,15 +22,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { addToCart, type Order } from "@/lib/store/store";
 import type { Food } from "@/lib/menu-data";
-import {
-  accompanimentTotal,
-  accompanimentTypes,
-  displayFoodName,
-  emptyAccompaniments,
-  maxAccompaniments,
-  type Accompaniments,
-  type AccompanimentType,
-} from "@/lib/accompaniments";
+import { displayFoodName } from "@/lib/food-utils";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
@@ -47,73 +38,7 @@ export function useAddFood() {
   return (
     food: Food,
     quantity = 1,
-    accompaniments: Accompaniments = emptyAccompaniments,
-  ) => dispatch(addToCart({ food, quantity, accompaniments }));
-}
-
-export function AccompanimentSelector({
-  value,
-  onChange,
-  maxTotal = maxAccompaniments,
-}: {
-  value: Accompaniments;
-  onChange: (value: Accompaniments) => void;
-  maxTotal?: number;
-}) {
-  const selectedTotal = accompanimentTotal(value);
-  return (
-    <fieldset className="mt-4">
-      <legend className="text-sm font-bold">Choose accompaniments</legend>
-      <div className="mt-3 grid gap-2">
-        {accompanimentTypes.map((type: AccompanimentType) => {
-          const otherCount = selectedTotal - value[type];
-          const canAdd =
-            value[type] < maxAccompaniments &&
-            otherCount + value[type] < maxTotal;
-          return (
-            <div
-              key={type}
-              className="flex items-center justify-between rounded-xl border border-stone-200 px-3 py-2"
-            >
-              <span className="text-sm font-semibold capitalize">{type}</span>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  aria-label={`Remove one ${type}`}
-                  disabled={value[type] === 0}
-                  onClick={() =>
-                    onChange({ ...value, [type]: Math.max(0, value[type] - 1) })
-                  }
-                  className="flex size-8 items-center justify-center rounded-full border border-stone-200 disabled:opacity-40"
-                >
-                  −
-                </button>
-                <span
-                  aria-label={`${value[type]} ${type}`}
-                  className="w-4 text-center text-sm font-bold tabular-nums"
-                >
-                  {value[type]}
-                </span>
-                <button
-                  type="button"
-                  aria-label={`Add one ${type}`}
-                  disabled={!canAdd}
-                  onClick={() => onChange({ ...value, [type]: value[type] + 1 })}
-                  className="flex size-8 items-center justify-center rounded-full border border-stone-200 disabled:opacity-40"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      <p className="mt-1 text-xs text-stone-500">
-        {selectedTotal} selected ·{" "}
-        {Math.max(0, maxTotal - selectedTotal)} more allowed for this item
-      </p>
-    </fieldset>
-  );
+  ) => dispatch(addToCart({ food, quantity }));
 }
 
 export function Logo() {
@@ -424,39 +349,8 @@ export function FoodCard({
   add,
 }: {
   food: Food;
-  add: (
-    food: Food,
-    quantity?: number,
-    accompaniments?: Accompaniments,
-  ) => void;
+  add: (food: Food, quantity?: number) => void;
 }) {
-  const [accompaniments, setAccompaniments] = useState<Accompaniments>({
-    ...emptyAccompaniments,
-  });
-  const cart = useAppSelector((state) => state.app.cart);
-  const selectedForFood =
-    cart.find((item) => item.food.id === food.id)?.accompaniments;
-  const remaining = Math.max(
-    0,
-    maxAccompaniments - accompanimentTotal(selectedForFood),
-  );
-  const [dialogOpen, setDialogOpen] = useState(false);
-
-  useEffect(() => {
-    if (!dialogOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [dialogOpen]);
-
-  function addSelectedFood() {
-    add(food, 1, accompaniments);
-    setAccompaniments({ ...emptyAccompaniments });
-    setDialogOpen(false);
-  }
-
   return (
     <article
       className="food-shadow group overflow-hidden rounded-[1.75rem] bg-white sm:
@@ -471,9 +365,6 @@ export function FoodCard({
           alt={displayFoodName(food.name)}
           className="size-full object-cover transition duration-700 group-hover:scale-105"
         />
-        <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold backdrop-blur">
-          {food.category?.name}
-        </span>
         {!food.available && (
           <span className="absolute inset-0 flex items-center justify-center bg-charcoal/60 font-bold text-white">
             Currently unavailable
@@ -482,7 +373,7 @@ export function FoodCard({
       </Link>
       <div className="p-5">
         <div className="flex items-start justify-between gap-3">
-          <div>
+          <div className="mb-auto">
             <Link
               href={`/food/${food.slug}`}
               className="text-xl font-bold leading-tight transition hover:text-friday"
@@ -503,7 +394,7 @@ export function FoodCard({
           <button
             type="button"
             disabled={!food.available}
-            onClick={() => setDialogOpen(true)}
+            onClick={() => add(food)}
             className="bg-charcoal flex size-11 items-center justify-center rounded-full text-white transition hover:rotate-6 hover:bg-friday disabled:opacity-30"
             aria-label={`Add ${displayFoodName(food.name)} to cart`}
           >
@@ -511,66 +402,6 @@ export function FoodCard({
           </button>
         </div>
       </div>
-      {dialogOpen &&
-        createPortal(
-          <div
-            className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm"
-            onMouseDown={(event) => {
-              if (event.target === event.currentTarget) setDialogOpen(false);
-            }}
-          >
-            <section
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby={`accompaniments-title-${food.id}`}
-              className="my-auto w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2
-                    id={`accompaniments-title-${food.id}`}
-                    className="font-display text-2xl"
-                  >
-                    Add to your order
-                  </h2>
-                  <p className="mt-1 text-sm text-stone-500">
-                    {displayFoodName(food.name)}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setDialogOpen(false)}
-                  aria-label="Close accompaniment choices"
-                  className="rounded-full bg-stone-100 p-2 hover:bg-stone-200"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-              <AccompanimentSelector
-                value={accompaniments}
-                onChange={setAccompaniments}
-                maxTotal={remaining}
-              />
-              <div className="mt-6 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setDialogOpen(false)}
-                  className="rounded-full border border-stone-200 px-5 py-3 text-sm font-bold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={addSelectedFood}
-                  className={buttonClass}
-                >
-                  Add to bag
-                </button>
-              </div>
-            </section>
-          </div>,
-          document.body,
-        )}
     </article>
   );
 }

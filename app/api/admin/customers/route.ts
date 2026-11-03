@@ -4,7 +4,7 @@ import { connectToDatabase } from "@/lib/db";
 import { Order } from "@/lib/models/order";
 import { User } from "@/lib/models/user";
 import { getSession } from "@/lib/session";
-import { displayFoodName } from "@/lib/accompaniments";
+import { displayFoodName } from "@/lib/food-utils";
 
 export async function GET(request: NextRequest) {
   try {

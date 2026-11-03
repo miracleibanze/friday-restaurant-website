@@ -5,6 +5,7 @@ export interface MenuItemFields {
   name: string;
   slug: string;
   description: string;
+  longDescription?: string;
   price: number;
   available: boolean;
   prepTime: number;
@@ -23,6 +24,7 @@ const menuItemSchema = new Schema<MenuItemFields>(
     name: { type: String, required: true, trim: true, maxlength: 120 },
     slug: { type: String, required: true, unique: true, trim: true, lowercase: true },
     description: { type: String, required: true, trim: true, maxlength: 1000 },
+    longDescription: { type: String, trim: true, maxlength: 5000 },
     price: { type: Number, required: true, min: 0 },
     available: { type: Boolean, default: true },
     prepTime: { type: Number, required: true, min: 1, max: 240, default: 25 },
@@ -32,6 +34,11 @@ const menuItemSchema = new Schema<MenuItemFields>(
   },
   { timestamps: true },
 );
+
+const cachedMenuItem = models.MenuItem as Model<MenuItemFields> | undefined;
+if (cachedMenuItem && !cachedMenuItem.schema.path("longDescription")) {
+  delete models.MenuItem;
+}
 
 export const MenuItem =
   (models.MenuItem as Model<MenuItemFields> | undefined) ??

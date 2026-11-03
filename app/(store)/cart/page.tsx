@@ -10,7 +10,7 @@ import {
 import { PageLoader } from "@/app/loading";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { removeFromCart, updateCartItem } from "@/lib/store/store";
-import { displayFoodName } from "@/lib/accompaniments";
+import { displayFoodName } from "@/lib/food-utils";
 import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 
@@ -37,7 +37,7 @@ export default function CartPage() {
       <SectionTitle eyebrow="Your order" title="Good choices." />
       <div className="grid gap-10 lg:grid-cols-[1fr_380px]">
         <div className="space-y-4">
-          {cart.map(({ food, quantity, accompaniments }) => (
+          {cart.map(({ food, quantity }) => (
             <div
               key={food.id}
               className="flex gap-4 rounded-3xl bg-white p-4 soft-ring"
@@ -60,13 +60,6 @@ export default function CartPage() {
                     </Link>
                     <p className="mt-1 text-sm text-stone-500">
                       {money(food.price)}
-                    </p>
-                    <p className="mt-1 text-xs capitalize text-stone-500">
-                      Accompaniments:{" "}
-                      {Object.entries(accompaniments)
-                        .filter(([, count]) => count > 0)
-                        .map(([name, count]) => `${count} ${name}`)
-                        .join(", ") || "none"}
                     </p>
                   </div>
                   <button

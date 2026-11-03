@@ -15,7 +15,6 @@ import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { completeOrder, Order } from "@/lib/store/store";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { accompanimentTypes } from "@/lib/accompaniments";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -58,12 +57,9 @@ export default function CheckoutPage() {
           deliveryAddress: String(data.address),
           notes: String(data.notes || ""),
           paymentMethod: String(data.payment),
-          items: cart.map(({ food, quantity, accompaniments }) => ({
+          items: cart.map(({ food, quantity }) => ({
             food: food.id,
             quantity,
-            accompaniments: Object.fromEntries(
-              accompanimentTypes.map((type) => [type, accompaniments[type]]),
-            ),
           })),
         }),
       });

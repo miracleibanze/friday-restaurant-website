@@ -15,6 +15,7 @@ export function serializeMenuItem(item: {
   name: string;
   slug: string;
   description: string;
+  longDescription?: string;
   price: number;
   available: boolean;
   prepTime: number;
@@ -27,6 +28,7 @@ export function serializeMenuItem(item: {
     name: item.name,
     slug: item.slug,
     description: item.description,
+    longDescription: item.longDescription ?? "",
     price: item.price,
     available: item.available,
     prepTime: item.prepTime,

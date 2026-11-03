@@ -64,6 +64,12 @@ function validateFields(body: Record<string, unknown>) {
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const description =
     typeof body.description === "string" ? body.description.trim() : "";
+  const longDescription =
+    typeof body.longDescription === "string"
+      ? body.longDescription.trim()
+      : body.longDescription === undefined
+        ? ""
+        : null;
   const image = typeof body.image === "string" ? body.image.trim() : "";
   const price = Number(body.price);
   const prepTime = Number(body.prepTime);
@@ -72,6 +78,8 @@ function validateFields(body: Record<string, unknown>) {
     name.length > 120 ||
     !description ||
     description.length > 1000 ||
+    longDescription === null ||
+    longDescription.length > 5000 ||
     !image ||
     !validImageDataUrl(image) ||
     !Number.isFinite(price) ||
@@ -84,7 +92,7 @@ function validateFields(body: Record<string, unknown>) {
   }
   const slug = slugify(typeof body.slug === "string" ? body.slug : name);
   if (!slug) return null;
-  return { name, description, image, price, prepTime, slug };
+  return { name, description, longDescription, image, price, prepTime, slug };
 }
 
 export async function GET(request: NextRequest) {

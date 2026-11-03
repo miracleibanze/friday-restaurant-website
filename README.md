@@ -41,7 +41,6 @@ All APIs are implemented as Next.js Route Handlers under `app/api`:
 - `PATCH /api/auth` — update signed-in customer profile.
 - `DELETE /api/auth` — sign out.
 - `POST /api/orders` — create an order. Guests may order too; signed-in customer orders are linked to their MongoDB user record.
-- Each order item may include `accompaniments` counts for chips, samosa, and pilau, up to four total accompaniments per menu item.
 - `GET /api/orders` — list the signed-in customer's orders.
 - `GET /api/orders?orderNumber=FR-...` — public order status lookup (does not disclose delivery address or customer contact details).
 - `PATCH /api/orders` — customer delivery confirmation with `{ "orderNumber": "...", "phone": "..." }`. The phone must match the order, and customers can confirm only orders marked as on the way; admins can still mark delivery from the dashboard.
