@@ -1,7 +1,7 @@
 'use client'
 
 import { EmptyState, money, SectionTitle } from "@/components/storefront-ui";
-import { PageLoader } from "@/app/loading";
+import { OrderHistorySkeleton } from "@/components/loading-skeletons";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { loadOrders, restoreSession } from "@/lib/store/store";
 import Link from "next/link";
@@ -15,7 +15,7 @@ export default function OrderHistoryPage() {
   const ordersStatus = useAppSelector((state) => state.app.ordersStatus);
 
   if (sessionStatus === "idle" || sessionStatus === "loading") {
-    return <PageLoader label="Checking your account…" />;
+    return <OrderHistorySkeleton />;
   }
   if (sessionStatus === "error") {
     return (
@@ -35,7 +35,7 @@ export default function OrderHistoryPage() {
     );
   }
   if (user && (ordersStatus === "idle" || ordersStatus === "loading")) {
-    return <PageLoader label="Loading your orders…" />;
+    return <OrderHistorySkeleton />;
   }
   if (!user)
     return (

@@ -5,7 +5,7 @@ import {
   inputClass,
   SectionTitle,
 } from "@/components/storefront-ui";
-import { PageLoader } from "@/app/loading";
+import { TrackingResultSkeleton } from "@/components/loading-skeletons";
 import { Order } from "@/lib/store/store";
 import { Check } from "lucide-react";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
@@ -221,7 +221,7 @@ export default function TrackingPage() {
           </div>
         )}
       </div>
-      {loading && <PageLoader label="Finding your order…" overlay />}
+      {loading && <TrackingResultSkeleton />}
     </main>
   );
 }

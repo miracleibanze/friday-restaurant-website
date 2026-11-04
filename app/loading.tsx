@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { RoutePageSkeleton } from "@/components/loading-skeletons";
 
 export function PageLoader({
   label,
@@ -56,6 +57,5 @@ export function PageLoader({
 }
 
 export default function Loading() {
-  return <PageLoader label="Loading your Friday experience…" />;
+  return <RoutePageSkeleton />;
 }
-

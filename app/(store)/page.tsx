@@ -7,6 +7,7 @@ import {
   SectionTitle,
   useAddFood,
 } from "@/components/storefront-ui";
+import { FoodGridSkeleton } from "@/components/loading-skeletons";
 import { ArrowRight, Clock3, Phone, Star, WavesVertical } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,9 +19,15 @@ export default function HomePage() {
   const [foods, setFoods] = useState<Food[]>([]);
   const [menuLoading, setMenuLoading] = useState(true);
   const [menuError, setMenuError] = useState("");
+  const [menuSlow, setMenuSlow] = useState(false);
+  const [menuAttempt, setMenuAttempt] = useState(0);
   useEffect(() => {
     const controller = new AbortController();
     let active = true;
+    setMenuLoading(true);
+    setMenuError("");
+    setMenuSlow(false);
+    const slowTimer = window.setTimeout(() => setMenuSlow(true), 8000);
     fetch("/api/menu", { signal: controller.signal })
       .then(async (response) => {
         const result = await response.json();
@@ -36,13 +43,15 @@ export default function HomePage() {
         setMenuError("Could not load the menu. Please try again later.");
       })
       .finally(() => {
+        window.clearTimeout(slowTimer);
         if (active) setMenuLoading(false);
       });
     return () => {
       active = false;
+      window.clearTimeout(slowTimer);
       controller.abort();
     };
-  }, []);
+  }, [menuAttempt]);
   return (
     <>
       <section className="relative overflow-hidden bg-opacity-gradient md:bg-gradient pb-8">
@@ -112,13 +121,33 @@ export default function HomePage() {
           />
           <div className="flex flex-wrap gap-5 flex-column lg:flex-row max-lg:items-center">
             {menuLoading ? (
-              <p role="status" className="w-full py-10 text-center text-stone-500">
-                Loading menu…
-              </p>
+              <div className="w-full">
+                {menuSlow && (
+                  <p role="status" className="mb-5 text-center text-sm text-stone-600">
+                    This is taking longer than usual. Check your connection or{" "}
+                    <button
+                      type="button"
+                      onClick={() => setMenuAttempt((attempt) => attempt + 1)}
+                      className="font-bold text-friday underline underline-offset-4"
+                    >
+                      try again
+                    </button>
+                    .
+                  </p>
+                )}
+                <FoodGridSkeleton count={6} />
+              </div>
             ) : menuError ? (
-              <p role="alert" className="w-full py-10 text-center text-red-700">
-                {menuError}
-              </p>
+              <div className="w-full py-10 text-center">
+                <p role="alert" className="text-red-700">{menuError}</p>
+                <button
+                  type="button"
+                  onClick={() => setMenuAttempt((attempt) => attempt + 1)}
+                  className={`${buttonClass} mt-5`}
+                >
+                  Try again
+                </button>
+              </div>
             ) : foods.length > 0 ? (
               foods.map((food) => (
                 <FoodCard key={food.id} food={food} add={add} />

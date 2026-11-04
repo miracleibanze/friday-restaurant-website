@@ -7,7 +7,7 @@ import {
   OrderSummary,
   SectionTitle,
 } from "@/components/storefront-ui";
-import { PageLoader } from "@/app/loading";
+import { CartPageSkeleton } from "@/components/loading-skeletons";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { cartItemKey, removeFromCart, updateCartItem } from "@/lib/store/store";
 import { displayFoodName } from "@/lib/food-utils";
@@ -23,7 +23,7 @@ export default function CartPage() {
     (sum, item) => sum + item.food.price * item.quantity,
     0,
   );
-  if (!initialized) return <PageLoader label="Restoring your basket…" />;
+  if (!initialized) return <CartPageSkeleton />;
   if (!cart.length)
     return (
       <EmptyState

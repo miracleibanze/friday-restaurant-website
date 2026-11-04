@@ -11,6 +11,7 @@ import {
   SectionTitle,
 } from "@/components/storefront-ui";
 import { PageLoader } from "@/app/loading";
+import { CheckoutPageSkeleton } from "@/components/loading-skeletons";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { completeOrder, Order } from "@/lib/store/store";
 import { useRouter } from "next/navigation";
@@ -30,7 +31,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   if (!initialized || sessionStatus === "idle" || sessionStatus === "loading") {
-    return <PageLoader label="Preparing your checkout…" />;
+    return <CheckoutPageSkeleton />;
   }
   if (!cart.length)
     return (

@@ -6,7 +6,7 @@ import {
   Field,
   SectionTitle,
 } from "@/components/storefront-ui";
-import { PageLoader } from "@/app/loading";
+import { ProfilePageSkeleton } from "@/components/loading-skeletons";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import {
   restoreSession,
@@ -29,7 +29,7 @@ export default function ProfilePage() {
   const [loggingOut, setLoggingOut] = useState(false);
 
   if (sessionStatus === "idle" || sessionStatus === "loading") {
-    return <PageLoader label="Loading your profile…" />;
+    return <ProfilePageSkeleton />;
   }
   if (sessionStatus === "error") {
     return (

@@ -17,6 +17,7 @@ import AdminFeatures from "@/components/admin-features";
 import { displayFoodName } from "@/lib/food-utils";
 import { accompanimentLabel } from "@/lib/accompaniments";
 import type { Accompaniments } from "@/lib/accompaniments";
+import { AdminRowsSkeleton } from "@/components/loading-skeletons";
 
 type OrderStatus =
   | "confirmed"
@@ -490,9 +491,7 @@ export default function AdminDashboard() {
                 </p>
               )}
               {loading && !orders.length ? (
-                <p className="py-16 text-center text-sm text-stone-500">
-                  Loading orders…
-                </p>
+                <AdminRowsSkeleton count={6} />
               ) : orders.length ? (
                 <div className="mt-5 divide-y divide-stone-100">
                   {orders.map((order) => (

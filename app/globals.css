@@ -26,6 +26,16 @@ body {
   margin: 0;
   background: #fbf7ef;
 }
+.skeleton-shimmer {
+  background: linear-gradient(100deg, #eee9e2 20%, #faf8f5 40%, #eee9e2 60%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+@keyframes skeleton-shimmer {
+  to {
+    background-position-x: -200%;
+  }
+}
 button,
 input,
 select,

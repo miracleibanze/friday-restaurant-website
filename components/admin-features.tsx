@@ -11,6 +11,7 @@ import { money } from "@/components/storefront-ui";
 import type { Food } from "@/lib/menu-data";
 import { displayFoodName } from "@/lib/food-utils";
 import { Trash2, X } from "lucide-react";
+import { AdminRowsSkeleton } from "@/components/loading-skeletons";
 
 type Section = "menu" | "payments" | "inbox" | "reports" | "customers";
 type MenuForm = {
@@ -467,7 +468,7 @@ function MenuManagement() {
         </div>
       )}
       {loading ? (
-        <p className="py-8 text-center text-sm text-stone-500">Loading menu…</p>
+        <AdminRowsSkeleton count={5} />
       ) : (
         <div className="mt-5 divide-y divide-stone-100">
           {items.map((item) => (
@@ -612,9 +613,7 @@ function PaymentManagement() {
         ))}
       </div>
       {loading ? (
-        <p className="py-8 text-center text-sm text-stone-500">
-          Loading payments…
-        </p>
+        <AdminRowsSkeleton count={5} />
       ) : orders.length ? (
         <div className="mt-4 divide-y divide-stone-100">
           {orders.map((order) => (
@@ -765,9 +764,7 @@ function MessageInbox() {
     >
       <Notice error={error} />
       {loading ? (
-        <p className="py-8 text-center text-sm text-stone-500">
-          Loading messages…
-        </p>
+        <AdminRowsSkeleton count={4} />
       ) : messages.length ? (
         <div className="mt-5 space-y-4">
           {messages.map((item) => (
@@ -942,9 +939,7 @@ function SalesReports() {
         </select>
       </label>
       {loading ? (
-        <p className="py-8 text-center text-sm text-stone-500">
-          Loading report…
-        </p>
+        <AdminRowsSkeleton count={5} />
       ) : (
         report && (
           <>
@@ -1154,9 +1149,7 @@ function CustomerManagement() {
         </button>
       </form>
       {loading ? (
-        <p className="py-8 text-center text-sm text-stone-500">
-          Loading customers…
-        </p>
+        <AdminRowsSkeleton count={5} />
       ) : customers.length ? (
         <>
           <div className="mt-4 divide-y divide-stone-100">

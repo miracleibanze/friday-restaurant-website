@@ -1,8 +1,8 @@
 "use client";
 
 import { ConfirmedOrder } from "@/components/storefront-ui";
+import { OrderConfirmationSkeleton } from "@/components/loading-skeletons";
 import { useAppSelector } from "@/lib/store/hooks";
-import { PageLoader } from "@/app/loading";
 
 export default function OrderConfirmationPage({ id }: { id?: string }) {
   const initialized = useAppSelector((state) => state.app.initialized);
@@ -15,10 +15,10 @@ export default function OrderConfirmationPage({ id }: { id?: string }) {
       : state.app.lastOrder,
   );
   if (!initialized || sessionStatus === "idle" || sessionStatus === "loading") {
-    return <PageLoader label="Loading your order…" />;
+    return <OrderConfirmationSkeleton />;
   }
   if (id && user && (ordersStatus === "idle" || ordersStatus === "loading")) {
-    return <PageLoader label="Finding your order…" />;
+    return <OrderConfirmationSkeleton />;
   }
   return <ConfirmedOrder order={order} />;
 }

@@ -6,7 +6,7 @@ import {
   money,
   useAddFood,
 } from "@/components/storefront-ui";
-import { PageLoader } from "@/app/loading";
+import { FoodDetailsSkeleton } from "@/components/loading-skeletons";
 import { displayFoodName } from "@/lib/food-utils";
 import { Check, Clock3, Minus, Plus, Star } from "lucide-react";
 import Link from "next/link";
@@ -75,6 +75,8 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
   const [food, setFood] = useState<Food | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
+  const [loadSlow, setLoadSlow] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const add = useAddFood();
   const [quantity, setQuantity] = useState(1);
   const [accompaniments, setAccompaniments] =
@@ -82,6 +84,10 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
   useEffect(() => {
     const controller = new AbortController();
     let active = true;
+    setLoading(true);
+    setLoadError("");
+    setLoadSlow(false);
+    const slowTimer = window.setTimeout(() => setLoadSlow(true), 8000);
 
     async function loadFood() {
       try {
@@ -107,6 +113,7 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
         console.error("Could not load menu item.", error);
         setLoadError("Could not load this menu item. Please try again.");
       } finally {
+        window.clearTimeout(slowTimer);
         if (active) setLoading(false);
       }
     }
@@ -114,16 +121,42 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
     void loadFood();
     return () => {
       active = false;
+      window.clearTimeout(slowTimer);
       controller.abort();
     };
-  }, [slug]);
-  if (loading) return <PageLoader label="Loading menu item…" />;
+  }, [slug, loadAttempt]);
+  if (loading)
+    return (
+      <>
+        <FoodDetailsSkeleton />
+        {loadSlow && (
+          <p role="status" className="fixed bottom-5 left-1/2 z-20 -translate-x-1/2 rounded-2xl bg-white px-5 py-3 text-center text-sm text-stone-600 soft-ring">
+            This is taking longer than usual.{" "}
+            <button
+              type="button"
+              onClick={() => setLoadAttempt((attempt) => attempt + 1)}
+              className="font-bold text-friday underline underline-offset-4"
+            >
+              Try again
+            </button>
+            .
+          </p>
+        )}
+      </>
+    );
   if (loadError)
     return (
       <main className="shell grid min-h-[50vh] place-items-center py-12">
-        <p role="alert" className="text-center text-stone-600">
-          {loadError}
-        </p>
+        <div className="text-center">
+          <p role="alert" className="text-stone-600">{loadError}</p>
+          <button
+            type="button"
+            onClick={() => setLoadAttempt((attempt) => attempt + 1)}
+            className={`${buttonClass} mt-5`}
+          >
+            Try again
+          </button>
+        </div>
       </main>
     );
   if (!food)
