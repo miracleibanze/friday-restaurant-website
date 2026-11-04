@@ -18,6 +18,54 @@ interface FoodDetailsProps {
   slug: string;
 }
 
+const accompanimentTypes = ["chips", "samosa", "pilau"] as const;
+type Accompaniments = Record<(typeof accompanimentTypes)[number], number>;
+
+function AccompanimentSelector() {
+  const [selected, setSelected] = useState<Accompaniments>({
+    chips: 0,
+    samosa: 0,
+    pilau: 0,
+  });
+  const total = Object.values(selected).reduce((sum, count) => sum + count, 0);
+
+  return (
+    <fieldset className="mt-6">
+      <legend className="text-sm font-bold">Choose up to 4 accompaniments</legend>
+      <div className="mt-2 grid grid-cols-3 gap-2">
+        {accompanimentTypes.map((type) => {
+          const otherCount = total - selected[type];
+          const limit = Math.max(0, 4 - otherCount);
+
+          return (
+            <label key={type} className="text-xs font-semibold capitalize text-stone-600">
+              {type}
+              <select
+                aria-label={`${type} accompaniment count`}
+                className="mt-1 w-full rounded-lg border border-stone-200 bg-white px-2 py-2 text-sm"
+                value={selected[type]}
+                onChange={(event) =>
+                  setSelected({
+                    ...selected,
+                    [type]: Math.min(Number(event.target.value), limit),
+                  })
+                }
+              >
+                {Array.from({ length: limit + 1 }, (_, count) => (
+                  <option key={count} value={count}>
+                    {count}
+                  </option>
+                ))}
+              </select>
+            </label>
+          );
+        })}
+      </div>
+      <p className="mt-1 text-xs text-stone-500">{total} of 4 selected</p>
+    </fieldset>
+  );
+}
+
 export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
   const [food, setFood] = useState<Food | null>(null);
   const [loading, setLoading] = useState(true);
@@ -80,6 +128,10 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
         action="Back to Home"
       />
     );
+  const isFullChicken =
+    food.slug.toLowerCase() === "full-chicken" ||
+    food.name.trim().toLowerCase() === "full chicken";
+
   return (
     <main className="shell py-12">
       <Link
@@ -124,6 +176,7 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
               {food.longDescription}
             </p>
           </section>
+          {isFullChicken && <AccompanimentSelector />}
           <div className="mt-8 border-y border-stone-200 py-7">
             <p className="font-display text-3xl">{money(food.price)}</p>
             <p className="mt-1 text-sm text-stone-500">
