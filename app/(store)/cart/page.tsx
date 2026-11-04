@@ -11,7 +11,7 @@ import { CartPageSkeleton } from "@/components/loading-skeletons";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { cartItemKey, removeFromCart, updateCartItem } from "@/lib/store/store";
 import { displayFoodName } from "@/lib/food-utils";
-import { accompanimentLabel } from "@/lib/accompaniments";
+import { accompanimentLabel, isFullChicken } from "@/lib/accompaniments";
 import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 
@@ -65,9 +65,16 @@ export default function CartPage() {
                     <p className="mt-1 text-sm text-stone-500">
                       {money(food.price)}
                     </p>
-                    {accompanimentLabel(accompaniments) && (
+                    {accompanimentLabel(
+                      accompaniments,
+                      isFullChicken(food) ? quantity : 0,
+                    ) && (
                       <p className="mt-1 text-xs capitalize text-stone-500">
-                        Sides: {accompanimentLabel(accompaniments)}
+                        Sides:{" "}
+                        {accompanimentLabel(
+                          accompaniments,
+                          isFullChicken(food) ? quantity : 0,
+                        )}
                       </p>
                     )}
                   </div>

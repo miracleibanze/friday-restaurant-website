@@ -26,6 +26,7 @@ export interface OrderItemFields {
   price: number;
   quantity: number;
   accompaniments?: Accompaniments;
+  bonusSambusa?: number;
 }
 
 export interface OrderFields {
@@ -68,13 +69,13 @@ const orderSchema = new Schema<OrderFields>(
           type: new Schema(
             {
               chips: { type: Number, min: 0, max: 4 },
-              sambusa: { type: Number, min: 0, max: 4 },
               pilau: { type: Number, min: 0, max: 4 },
             },
             { _id: false },
           ),
           default: undefined,
         },
+        bonusSambusa: { type: Number, min: 0, default: 0 },
       },
     ],
     subtotal: { type: Number, required: true, min: 0 },

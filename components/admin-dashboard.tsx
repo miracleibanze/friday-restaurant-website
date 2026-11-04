@@ -40,6 +40,7 @@ type Order = {
     price: number;
     quantity: number;
     accompaniments?: Accompaniments;
+    bonusSambusa?: number;
   }>;
   subtotal: number;
   deliveryFee: number;
@@ -762,9 +763,16 @@ function OrderModal({
             >
               <span>
                 {item.quantity} × {displayFoodName(item.name)}
-                {accompanimentLabel(item.accompaniments) && (
+                {accompanimentLabel(
+                  item.accompaniments,
+                  item.bonusSambusa ?? 0,
+                ) && (
                   <span className="block text-xs capitalize text-stone-500">
-                    Sides: {accompanimentLabel(item.accompaniments)}
+                    Sides:{" "}
+                    {accompanimentLabel(
+                      item.accompaniments,
+                      item.bonusSambusa ?? 0,
+                    )}
                   </span>
                 )}
               </span>

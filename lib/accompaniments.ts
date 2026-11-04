@@ -1,12 +1,11 @@
 import type { Food } from "@/lib/menu-data";
 
-export const accompanimentTypes = ["chips", "sambusa", "pilau"] as const;
+export const accompanimentTypes = ["chips", "pilau"] as const;
 export type AccompanimentType = (typeof accompanimentTypes)[number];
 export type Accompaniments = Record<AccompanimentType, number>;
 
 export const emptyAccompaniments: Accompaniments = {
   chips: 0,
-  sambusa: 0,
   pilau: 0,
 };
 
@@ -41,11 +40,16 @@ export function isFullChicken(food: Pick<Food, "name" | "slug">) {
     searchableName.includes("whole chicken");
 }
 
-export function accompanimentLabel(value?: Partial<Accompaniments>) {
-  return accompanimentTypes
+export function accompanimentLabel(
+  value?: Partial<Accompaniments>,
+  bonusSambusa = 0,
+) {
+  const selected = accompanimentTypes
     .filter((type) => (value?.[type] ?? 0) > 0)
     .map((type) => `${value?.[type] ?? 0} ${type}`)
     .join(", ");
+  const bonus = bonusSambusa > 0 ? `Bonus: ${bonusSambusa} sambusa` : "";
+  return [selected, bonus].filter(Boolean).join(" · ");
 }
 
 export function accompanimentKey(value?: Partial<Accompaniments>) {

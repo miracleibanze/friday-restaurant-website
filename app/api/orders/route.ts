@@ -28,10 +28,11 @@ export async function GET(request: NextRequest) {
           paymentStatus: order.paymentStatus ?? "pending",
           total: order.total,
           createdAt: order.createdAt.toISOString(),
-          items: order.items.map(({ name, quantity, accompaniments }) => ({
+          items: order.items.map(({ name, quantity, accompaniments, bonusSambusa }) => ({
             name: displayFoodName(name),
             quantity,
             accompaniments,
+            bonusSambusa,
           })),
         },
       });
@@ -80,9 +81,10 @@ export async function POST(request: NextRequest) {
       }
       const food = menuItems.find((menuItem) => menuItem.id === requested.food && menuItem.available);
       if (!food) return NextResponse.json({ error: "One or more selected menu items are unavailable." }, { status: 400 });
+      const fullChicken = isFullChicken(food);
       if (
         requested.accompaniments !== undefined &&
-        (!isAccompaniments(requested.accompaniments) || !isFullChicken(food))
+        (!isAccompaniments(requested.accompaniments) || !fullChicken)
       ) {
         return NextResponse.json({ error: "One or more accompaniment selections are invalid." }, { status: 400 });
       }
@@ -94,6 +96,9 @@ export async function POST(request: NextRequest) {
         ...(isAccompaniments(requested.accompaniments) &&
         accompanimentTotal(requested.accompaniments) > 0
           ? { accompaniments: requested.accompaniments }
+          : {}),
+        ...(fullChicken
+          ? { bonusSambusa: Number(requested.quantity) }
           : {}),
       });
     }

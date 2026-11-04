@@ -153,6 +153,11 @@ function AccompanimentModal({
                 {total} / 4 selected
               </span>
             </div>
+            <div className="mb-3 flex flex-wrap gap-2 text-xs font-bold">
+              <span className="rounded-full bg-sage/10 px-3 py-1.5 text-sage">
+                Bonus included: 1 sambusa
+              </span>
+            </div>
             <div className="space-y-2.5">
               {accompanimentTypes.map((type) => {
                 const limit = total - selected[type] < 4;
@@ -162,8 +167,12 @@ function AccompanimentModal({
                     className="flex items-center justify-between rounded-2xl border border-stone-200 bg-white p-3.5 transition hover:border-friday/40"
                   >
                     <div>
-                      <span className="font-semibold capitalize text-charcoal">{type}</span>
-                      <span className="mt-0.5 block text-xs text-stone-400">Side portion</span>
+                      <span className="font-semibold capitalize text-charcoal">
+                        {type}
+                      </span>
+                      <span className="mt-0.5 block text-xs text-stone-400">
+                        Side portion
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <button

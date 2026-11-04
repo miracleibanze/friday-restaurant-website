@@ -15,6 +15,7 @@ export type CartItem = {
   food: Food;
   quantity: number;
   accompaniments?: Accompaniments;
+  bonusSambusa?: number;
 };
 
 export function cartItemKey(item: CartItem) {

@@ -28,6 +28,7 @@ export function serializeOrder(order: OrderDocument) {
       price: item.price,
       quantity: item.quantity,
       accompaniments: item.accompaniments,
+      bonusSambusa: item.bonusSambusa,
     })),
     subtotal: order.subtotal,
     deliveryFee: order.deliveryFee,
