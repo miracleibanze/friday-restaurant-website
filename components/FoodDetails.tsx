@@ -37,11 +37,9 @@ function AccompanimentSelector({
   return (
     <fieldset className="mt-6">
       <legend className="text-sm font-bold">Choose up to 4 accompaniments</legend>
-      <div className="mt-2 flex flex-wrap gap-2 text-xs font-bold">
-        <span className="rounded-full bg-sage/10 px-3 py-1.5 text-sage">
-          Bonus included: 1 sambusa
-        </span>
-      </div>
+      <p className="mb-2 text-base font-bold text-sage sm:text-lg">
+        Bonus: 1 sambusa included
+      </p>
       <div className="mt-2 grid grid-cols-3 gap-2">
         {accompanimentTypes.map((type: AccompanimentType) => {
           const otherCount = total - value[type];
