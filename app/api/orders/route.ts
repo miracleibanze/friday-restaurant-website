@@ -8,6 +8,11 @@ import { Order } from "@/lib/models/order";
 import { User } from "@/lib/models/user";
 import { getSession } from "@/lib/session";
 import { displayFoodName } from "@/lib/food-utils";
+import {
+  accompanimentTotal,
+  isAccompaniments,
+  isFullChicken,
+} from "@/lib/accompaniments";
 
 export async function GET(request: NextRequest) {
   try {
@@ -23,9 +28,10 @@ export async function GET(request: NextRequest) {
           paymentStatus: order.paymentStatus ?? "pending",
           total: order.total,
           createdAt: order.createdAt.toISOString(),
-          items: order.items.map(({ name, quantity }) => ({
+          items: order.items.map(({ name, quantity, accompaniments }) => ({
             name: displayFoodName(name),
             quantity,
+            accompaniments,
           })),
         },
       });
@@ -65,6 +71,7 @@ export async function POST(request: NextRequest) {
     const requestedItems = body.items as Array<{
       food?: unknown;
       quantity?: unknown;
+      accompaniments?: unknown;
     }>;
     const items = [];
     for (const requested of requestedItems) {
@@ -73,11 +80,21 @@ export async function POST(request: NextRequest) {
       }
       const food = menuItems.find((menuItem) => menuItem.id === requested.food && menuItem.available);
       if (!food) return NextResponse.json({ error: "One or more selected menu items are unavailable." }, { status: 400 });
+      if (
+        requested.accompaniments !== undefined &&
+        (!isAccompaniments(requested.accompaniments) || !isFullChicken(food))
+      ) {
+        return NextResponse.json({ error: "One or more accompaniment selections are invalid." }, { status: 400 });
+      }
       items.push({
         food: food.id,
         name: displayFoodName(food.name),
         price: food.price,
         quantity: Number(requested.quantity),
+        ...(isAccompaniments(requested.accompaniments) &&
+        accompanimentTotal(requested.accompaniments) > 0
+          ? { accompaniments: requested.accompaniments }
+          : {}),
       });
     }
 

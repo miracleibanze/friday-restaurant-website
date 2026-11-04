@@ -13,28 +13,33 @@ import Link from "next/link";
 import { useState } from "react";
 import { useEffect } from "react";
 import type { Food } from "@/lib/menu-data";
+import {
+  accompanimentTotal,
+  accompanimentTypes,
+  emptyAccompaniments,
+  isFullChicken,
+  type Accompaniments,
+  type AccompanimentType,
+} from "@/lib/accompaniments";
 
 interface FoodDetailsProps {
   slug: string;
 }
 
-const accompanimentTypes = ["chips", "samosa", "pilau"] as const;
-type Accompaniments = Record<(typeof accompanimentTypes)[number], number>;
-
-function AccompanimentSelector() {
-  const [selected, setSelected] = useState<Accompaniments>({
-    chips: 0,
-    samosa: 0,
-    pilau: 0,
-  });
-  const total = Object.values(selected).reduce((sum, count) => sum + count, 0);
-
+function AccompanimentSelector({
+  value,
+  onChange,
+}: {
+  value: Accompaniments;
+  onChange: (value: Accompaniments) => void;
+}) {
+  const total = accompanimentTotal(value);
   return (
     <fieldset className="mt-6">
       <legend className="text-sm font-bold">Choose up to 4 accompaniments</legend>
       <div className="mt-2 grid grid-cols-3 gap-2">
-        {accompanimentTypes.map((type) => {
-          const otherCount = total - selected[type];
+        {accompanimentTypes.map((type: AccompanimentType) => {
+          const otherCount = total - value[type];
           const limit = Math.max(0, 4 - otherCount);
 
           return (
@@ -43,10 +48,10 @@ function AccompanimentSelector() {
               <select
                 aria-label={`${type} accompaniment count`}
                 className="mt-1 w-full rounded-lg border border-stone-200 bg-white px-2 py-2 text-sm"
-                value={selected[type]}
+                value={value[type]}
                 onChange={(event) =>
-                  setSelected({
-                    ...selected,
+                  onChange({
+                    ...value,
                     [type]: Math.min(Number(event.target.value), limit),
                   })
                 }
@@ -72,6 +77,8 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
   const [loadError, setLoadError] = useState("");
   const add = useAddFood();
   const [quantity, setQuantity] = useState(1);
+  const [accompaniments, setAccompaniments] =
+    useState<Accompaniments>(emptyAccompaniments);
   useEffect(() => {
     const controller = new AbortController();
     let active = true;
@@ -128,9 +135,7 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
         action="Back to Home"
       />
     );
-  const isFullChicken =
-    food.slug.toLowerCase() === "friday-full-chicken" ||
-    food.name.trim().toLowerCase() === "friday full chicken";
+  const fullChicken = isFullChicken(food);
 
   return (
     <main className="shell py-12">
@@ -176,7 +181,12 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
               {food.longDescription}
             </p>
           </section>
-          {isFullChicken && <AccompanimentSelector />}
+          {fullChicken && (
+            <AccompanimentSelector
+              value={accompaniments}
+              onChange={setAccompaniments}
+            />
+          )}
           <div className="mt-8 border-y border-stone-200 py-7">
             <p className="font-display text-3xl">{money(food.price)}</p>
             <p className="mt-1 text-sm text-stone-500">
@@ -203,7 +213,9 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
             </div>
             <button
               type="button"
-              onClick={() => add(food, quantity)}
+              onClick={() =>
+                add(food, quantity, fullChicken ? accompaniments : undefined)
+              }
               disabled={!food.available}
               className={`${buttonClass} flex-1`}
             >

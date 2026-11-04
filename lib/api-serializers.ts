@@ -27,6 +27,7 @@ export function serializeOrder(order: OrderDocument) {
       name: displayFoodName(item.name),
       price: item.price,
       quantity: item.quantity,
+      accompaniments: item.accompaniments,
     })),
     subtotal: order.subtotal,
     deliveryFee: order.deliveryFee,

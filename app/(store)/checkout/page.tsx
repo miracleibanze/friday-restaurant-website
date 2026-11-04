@@ -57,9 +57,10 @@ export default function CheckoutPage() {
           deliveryAddress: String(data.address),
           notes: String(data.notes || ""),
           paymentMethod: String(data.payment),
-          items: cart.map(({ food, quantity }) => ({
+          items: cart.map(({ food, quantity, accompaniments }) => ({
             food: food.id,
             quantity,
+            accompaniments,
           })),
         }),
       });

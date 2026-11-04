@@ -5,11 +5,21 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import type { Food } from "@/lib/menu-data";
+import {
+  accompanimentKey,
+  accompanimentTotal,
+  type Accompaniments,
+} from "@/lib/accompaniments";
 
 export type CartItem = {
   food: Food;
   quantity: number;
+  accompaniments?: Accompaniments;
 };
+
+export function cartItemKey(item: CartItem) {
+  return `${item.food.id}:${accompanimentKey(item.accompaniments)}`;
+}
 export type Customer = {
   id: string;
   name: string;
@@ -32,6 +42,7 @@ export type Order = {
     name: string;
     price: number;
     quantity: number;
+    accompaniments?: Accompaniments;
   }>;
   subtotal: number;
   deliveryFee: number;
@@ -106,9 +117,10 @@ const appSlice = createSlice({
       state,
       action: PayloadAction<{ cart: CartItem[]; lastOrder: Order | null }>,
     ) {
-      state.cart = action.payload.cart.map(({ food, quantity }) => ({
+      state.cart = action.payload.cart.map(({ food, quantity, accompaniments }) => ({
         food,
         quantity,
+        accompaniments,
       }));
       state.lastOrder = action.payload.lastOrder;
       state.initialized = true;
@@ -143,11 +155,19 @@ const appSlice = createSlice({
       action: PayloadAction<{
         food: Food;
         quantity?: number;
+        accompaniments?: Accompaniments;
       }>,
     ) {
       const quantity = action.payload.quantity ?? 1;
+      const accompaniments =
+        accompanimentTotal(action.payload.accompaniments) > 0
+          ? action.payload.accompaniments
+          : undefined;
       const item = state.cart.find(
-        ({ food }) => food.id === action.payload.food.id,
+        (cartItem) =>
+          cartItem.food.id === action.payload.food.id &&
+          accompanimentKey(cartItem.accompaniments) ===
+            accompanimentKey(accompaniments),
       );
       if (item) {
         item.quantity += quantity;
@@ -155,6 +175,7 @@ const appSlice = createSlice({
         state.cart.push({
           food: action.payload.food,
           quantity,
+          accompaniments,
         });
       }
     },
@@ -171,17 +192,19 @@ const appSlice = createSlice({
     ) {
       if (action.payload.quantity < 1) {
         state.cart = state.cart.filter(
-          ({ food }) => food.id !== action.payload.id,
+          (item) => cartItemKey(item) !== action.payload.id,
         );
       } else {
         const item = state.cart.find(
-          ({ food }) => food.id === action.payload.id,
+          (cartItem) => cartItemKey(cartItem) === action.payload.id,
         );
         if (item) item.quantity = action.payload.quantity;
       }
     },
     removeFromCart(state, action: PayloadAction<string>) {
-      state.cart = state.cart.filter(({ food }) => food.id !== action.payload);
+      state.cart = state.cart.filter(
+        (item) => cartItemKey(item) !== action.payload,
+      );
     },
     completeOrder(state, action: PayloadAction<Order>) {
       state.lastOrder = action.payload;

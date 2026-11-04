@@ -15,6 +15,8 @@ import {
 import { StoreHeader } from "@/components/storefront-ui";
 import AdminFeatures from "@/components/admin-features";
 import { displayFoodName } from "@/lib/food-utils";
+import { accompanimentLabel } from "@/lib/accompaniments";
+import type { Accompaniments } from "@/lib/accompaniments";
 
 type OrderStatus =
   | "confirmed"
@@ -36,6 +38,7 @@ type Order = {
     name: string;
     price: number;
     quantity: number;
+    accompaniments?: Accompaniments;
   }>;
   subtotal: number;
   deliveryFee: number;
@@ -760,6 +763,11 @@ function OrderModal({
             >
               <span>
                 {item.quantity} × {displayFoodName(item.name)}
+                {accompanimentLabel(item.accompaniments) && (
+                  <span className="block text-xs capitalize text-stone-500">
+                    Sides: {accompanimentLabel(item.accompaniments)}
+                  </span>
+                )}
               </span>
               <span className="font-semibold">
                 {money(item.price * item.quantity)}

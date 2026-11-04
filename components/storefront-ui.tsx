@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Camera,
   ChevronUp,
   CircleUserRound,
   Clock3,
+  Minus,
   MapPin,
   Menu as MenuIcon,
   MessageCircle,
@@ -23,6 +25,13 @@ import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { addToCart, type Order } from "@/lib/store/store";
 import type { Food } from "@/lib/menu-data";
 import { displayFoodName } from "@/lib/food-utils";
+import {
+  accompanimentTotal,
+  accompanimentTypes,
+  emptyAccompaniments,
+  isFullChicken,
+  type Accompaniments,
+} from "@/lib/accompaniments";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
@@ -38,7 +47,185 @@ export function useAddFood() {
   return (
     food: Food,
     quantity = 1,
-  ) => dispatch(addToCart({ food, quantity }));
+    accompaniments?: Accompaniments,
+  ) => dispatch(addToCart({ food, quantity, accompaniments }));
+}
+
+function AccompanimentModal({
+  food,
+  onClose,
+  onAdd,
+}: {
+  food: Food;
+  onClose: () => void;
+  onAdd: (quantity: number, accompaniments: Accompaniments) => void;
+}) {
+  const [quantity, setQuantity] = useState(1);
+  const [selected, setSelected] = useState<Accompaniments>(emptyAccompaniments);
+  const total = accompanimentTotal(selected);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <div
+      className="fixed inset-x-0 bottom-0 top-[3.75rem] z-[998] flex items-start justify-center overflow-y-auto bg-charcoal/55 px-3 pb-4 pt-4 backdrop-blur-sm sm:px-6 sm:pb-6 sm:pt-6"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="accompaniment-title"
+        className="flex max-h-full w-full max-w-lg flex-col overflow-hidden rounded-[1.75rem] bg-[#fcfcfc] food-shadow sm:rounded-[2rem]"
+      >
+        <div className="relative h-36 shrink-0 overflow-hidden sm:h-44">
+          <img
+            src={food.image}
+            alt={displayFoodName(food.name)}
+            className="size-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-charcoal/70 via-charcoal/10 to-charcoal/10" />
+          <p className="absolute bottom-4 left-5 text-xs font-bold uppercase tracking-[.2em] text-white/85">
+            Make it your own
+          </p>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close accompaniment selection"
+            className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full bg-white/90 text-charcoal shadow-sm transition hover:rotate-90 hover:bg-white"
+          >
+            <X size={18} />
+          </button>
+        </div>
+        <div className="min-h-0 overflow-y-auto p-4 sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <h2 id="accompaniment-title" className="font-display sm:text-2xl text-xl">
+                {displayFoodName(food.name)}
+              </h2>
+              <p className="mt-1 line-clamp-2 text-sm leading-6 text-stone-500">
+                {food.description}
+              </p>
+            </div>
+            <span className="shrink-0 rounded-full bg-orange-50 px-3 py-1.5 text-sm font-bold text-friday">
+              {money(food.price)}
+            </span>
+          </div>
+          <div className="mt-5 flex items-center justify-between rounded-2xl bg-white p-3.5 soft-ring">
+            <span className="text-sm font-bold text-stone-600">Quantity</span>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                aria-label="Decrease quantity"
+                disabled={quantity <= 1}
+                onClick={() => setQuantity((current) => Math.max(1, current - 1))}
+                className="flex size-8 items-center justify-center rounded-full bg-stone-100 disabled:opacity-40"
+              >
+                <Minus size={14} />
+              </button>
+              <span className="w-5 text-center font-bold text-charcoal">{quantity}</span>
+              <button
+                type="button"
+                aria-label="Increase quantity"
+                onClick={() => setQuantity((current) => current + 1)}
+                className="flex size-8 items-center justify-center rounded-full bg-stone-100"
+              >
+                <Plus size={14} />
+              </button>
+            </div>
+          </div>
+          <div className="mt-6">
+            <div className="mb-1 flex items-center justify-between gap-3">
+              <h3 className="font-display text-xl">Choose your sides</h3>
+              <span className="rounded-full bg-sage/10 px-3 py-1 text-xs font-bold text-sage">
+                {total} / 4 selected
+              </span>
+            </div>
+            <div className="space-y-2.5">
+              {accompanimentTypes.map((type) => {
+                const limit = total - selected[type] < 4;
+                return (
+                  <div
+                    key={type}
+                    className="flex items-center justify-between rounded-2xl border border-stone-200 bg-white p-3.5 transition hover:border-friday/40"
+                  >
+                    <div>
+                      <span className="font-semibold capitalize text-charcoal">{type}</span>
+                      <span className="mt-0.5 block text-xs text-stone-400">Side portion</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        aria-label={`Remove one ${type}`}
+                        disabled={selected[type] === 0}
+                        onClick={() =>
+                          setSelected((current) => ({
+                            ...current,
+                            [type]: current[type] - 1,
+                          }))
+                        }
+                        className="flex size-7 items-center justify-center rounded-full bg-stone-100 disabled:opacity-40"
+                      >
+                        <Minus size={13} />
+                      </button>
+                      <span className="w-5 text-center text-sm font-bold">
+                        {selected[type]}
+                      </span>
+                      <button
+                        type="button"
+                        aria-label={`Add one ${type}`}
+                        disabled={!limit}
+                        onClick={() =>
+                          setSelected((current) => ({
+                            ...current,
+                            [type]: current[type] + 1,
+                          }))
+                        }
+                        className="flex size-7 items-center justify-center rounded-full bg-stone-100 disabled:opacity-40"
+                      >
+                        <Plus size={13} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+        <div className="shrink-0 border-t border-stone-200 bg-white px-4 pb-4 pt-3 sm:px-6 sm:pb-6">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="font-semibold text-stone-600">Total</span>
+            <span className="font-display text-2xl">
+              {money(food.price * quantity)}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              onAdd(quantity, selected);
+              onClose();
+            }}
+            className={`${buttonClass} w-full`}
+          >
+            Add to bag · {money(food.price * quantity)}
+          </button>
+        </div>
+      </section>
+    </div>,
+    document.body,
+  );
 }
 
 export function Logo() {
@@ -64,11 +251,14 @@ export function Logo() {
 
 export function StoreHeader({ minimal = false }: { minimal?: boolean }) {
   const cart = useAppSelector((state) => state.app.cart);
+  const cartInitialized = useAppSelector((state) => state.app.initialized);
   const user = useAppSelector((state) => state.app.user);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const [cartList, setCartList] = useState(false);
-  const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const count = cartInitialized
+    ? cart.reduce((sum, item) => sum + item.quantity, 0)
+    : 0;
   const linksNeeded =
     !minimal &&
     !["/login", "/register", "/forgot-password"].some((path) =>
@@ -349,9 +539,15 @@ export function FoodCard({
   add,
 }: {
   food: Food;
-  add: (food: Food, quantity?: number) => void;
+  add: (
+    food: Food,
+    quantity?: number,
+    accompaniments?: Accompaniments,
+  ) => void;
 }) {
+  const [showAccompanimentModal, setShowAccompanimentModal] = useState(false);
   return (
+    <>
     <article
       className="food-shadow group overflow-hidden rounded-[1.75rem] bg-white sm:
     w-60 md:max-w-96 max-md:flex-1 min-w-60"
@@ -394,7 +590,11 @@ export function FoodCard({
           <button
             type="button"
             disabled={!food.available}
-            onClick={() => add(food)}
+            onClick={() =>
+              isFullChicken(food)
+                ? setShowAccompanimentModal(true)
+                : add(food)
+            }
             className="bg-charcoal flex size-11 items-center justify-center rounded-full text-white transition hover:rotate-6 hover:bg-friday disabled:opacity-30"
             aria-label={`Add ${displayFoodName(food.name)} to cart`}
           >
@@ -403,6 +603,16 @@ export function FoodCard({
         </div>
       </div>
     </article>
+    {showAccompanimentModal && (
+      <AccompanimentModal
+        food={food}
+        onClose={() => setShowAccompanimentModal(false)}
+        onAdd={(quantity, accompaniments) =>
+          add(food, quantity, accompaniments)
+        }
+      />
+    )}
+    </>
   );
 }
 
