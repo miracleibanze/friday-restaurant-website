@@ -129,8 +129,8 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
       />
     );
   const isFullChicken =
-    food.slug.toLowerCase() === "full-chicken" ||
-    food.name.trim().toLowerCase() === "full chicken";
+    food.slug.toLowerCase() === "friday-full-chicken" ||
+    food.name.trim().toLowerCase() === "friday full chicken";
 
   return (
     <main className="shell py-12">
