@@ -44,11 +44,16 @@ export default function ContactPage() {
             Friday Restaurant
           </h2>
           <div className="mt-8 space-y-6 text-sm text-stone-300">
-            <p className="flex gap-3">
+            <a
+              href="https://maps.app.goo.gl/6D8CJSscADL6tnb68"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex gap-3"
+            >
               <MapPin className="text-friday" /> KG 7 Ave, Kimihurura
               <br />
               Kigali, Rwanda
-            </p>
+            </a>
             <a href="tel:+250788767191" className="flex gap-3">
               <Phone className="text-friday" /> 0788767191
             </a>  

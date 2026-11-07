@@ -452,10 +452,15 @@ export function StoreFooter() {
         <div>
           <p className="font-display text-lg">Visit Friday</p>
           <div className="mt-5 space-y-3 text-sm text-stone-300">
-            <p className="flex gap-3">
+            <a
+              href="https://maps.app.goo.gl/6D8CJSscADL6tnb68"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex gap-3"
+            >
               <MapPin size={18} className="text-friday" /> KG 7 Ave, Kigali,
               Rwanda
-            </p>
+            </a>
             <a href="tel:+250788767191" className="flex gap-3">
               <Phone size={18} className="text-friday" /> 0788767191
             </a>
