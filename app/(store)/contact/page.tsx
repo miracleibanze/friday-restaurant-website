@@ -49,16 +49,16 @@ export default function ContactPage() {
               <br />
               Kigali, Rwanda
             </p>
-            <a href="tel:+250782723621" className="flex gap-3">
-              <Phone className="text-friday" /> +250 782 723 621
+            <a href="tel:+250788767191" className="flex gap-3">
+              <Phone className="text-friday" /> 0788767191
             </a>  
             <a
-                href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent("pascaluwimana1@gmail.com")}`}
+                href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent("amosndayam@gmail.com")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex gap-3"
               >
-                <Mail className="text-friday" /> pascaluwimana1@gmail.com
+                <Mail className="text-friday" /> amosndayam@gmail.com
               </a>
             <p className="flex gap-3">
               <Clock3 className="text-friday" /> Daily, 10:00–22:30

@@ -456,17 +456,17 @@ export function StoreFooter() {
               <MapPin size={18} className="text-friday" /> KG 7 Ave, Kigali,
               Rwanda
             </p>
-            <a href="tel:+250782723621" className="flex gap-3">
-              <Phone size={18} className="text-friday" /> +250 782 723 621
+            <a href="tel:+250788767191" className="flex gap-3">
+              <Phone size={18} className="text-friday" /> 0788767191
             </a>
             <a
-              href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent("pascaluwimana1@gmail.com")}`}
+              href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent("amosndayam@gmail.com")}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex gap-3"
             >
               <Mail size={18} className="text-friday" />{" "}
-              pascaluwimana1@gmail.com
+              amosndayam@gmail.com
             </a>
             <p className="flex gap-3">
               <Clock3 size={18} className="text-friday" /> Daily, 10:00–22:30
