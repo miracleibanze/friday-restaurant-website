@@ -5,6 +5,7 @@ Restaurant ordering website built with Next.js App Router, Redux Toolkit, and Mo
 ## App structure
 
 - Each customer-facing URL has its own `page.tsx` under `app/(store)/`; `app/(store)/layout.tsx` provides the shared navigation and footer.
+- `/sitemap.xml` lists public storefront pages and food pages using the current menu slugs.
 - `app/layout.tsx` wraps the application in the React Redux provider.
 - `lib/store/store.ts` owns cart, signed-in customer, and order state. The cart is persisted in the browser; accounts and orders come from the Mongoose API.
 - `/admin` is a standalone admin dashboard, outside the storefront layout.

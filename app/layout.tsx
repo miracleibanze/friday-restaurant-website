@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import StoreProvider from "@/components/store-provider";
+import { siteUrl } from "@/lib/site-config";
 import "./globals.css";
 
-const siteUrl = "https://friday-restaurant-website.vercel.app";
 const siteTitle = "Friday Restaurant | Chicken, Fish & Burgers in Kigali";
 const siteDescription =
   "Order whole chicken, half chicken, chicken wings, chicken legs, chicken burgers, beef burgers, and whole fish at Friday Restaurant in Kigali, Rwanda. Explore our menu and order online.";
