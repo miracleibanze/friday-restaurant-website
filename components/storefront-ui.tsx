@@ -284,6 +284,10 @@ export function StoreHeader({ minimal = false }: { minimal?: boolean }) {
   };
 
   useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
     if (cart.length > 0) setCartList(true);
     setTimeout(() => {
       setCartList(false);
