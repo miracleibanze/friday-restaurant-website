@@ -56,6 +56,9 @@ export const metadata: Metadata = {
     images: [`${siteUrl}/logo2.png`],
   },
   robots: { index: true, follow: true },
+  verification: {
+    google: "a_tAui1g8SWAboieXi33zsuPOcHTW_3Z3TyD9AkQ_YA", 
+  },
 };
 
 export default function RootLayout({
