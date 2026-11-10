@@ -415,19 +415,20 @@ export function StoreHeader({ minimal = false }: { minimal?: boolean }) {
           </nav>
         )}
       </header>
-      <div
-        role="status"
-        className="fixed inset-x-0 bottom-0 z-[100] bg-amber-100 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] text-center text-sm font-semibold text-amber-950 shadow-[0_-4px_16px_rgb(0_0_0_/_0.08)]"
-      >
-        The business is currently not open. Orders placed during this time will
-        be considered test trials and won't be processes, and will be deleted when the business is open.
-      </div>
+      
     </>
   );
 }
 
 export function StoreFooter() {
-  return (
+  return (<>
+    <div
+        role="status"
+        className="sticky inset-x-0 bottom-0 z-[100] bg-amber-100 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] text-center text-sm font-semibold text-amber-950 shadow-[0_-4px_16px_rgb(0_0_0_/_0.08)]"
+      >
+        The business is currently not open. Orders placed during this time will
+        be considered test trials and won't be processes, and will be deleted when the business is open.
+      </div>
     <footer className="bg-charcoal mt-24 text-white z-[200]">
       <div className="shell grid gap-12 py-16 md:grid-cols-2 lg:grid-cols-4">
         <div>
@@ -512,7 +513,7 @@ export function StoreFooter() {
           </a>
         </p>
       </div>
-    </footer>
+    </footer></>
   );
 }
 
