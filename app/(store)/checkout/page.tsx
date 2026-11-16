@@ -141,10 +141,10 @@ export default function CheckoutPage() {
               ))}
               <p className="sm:col-span-3">
                 To Place an ORDER, See our Menu, Call us on{" "}
-                <strong>+250 782 723 621</strong> and let us know what you want.
+                <strong>+250 782 578 829 (Amos NDAYAMBAJE)</strong> and let us know what you want.
                 You then Make Payment via{" "}
-                <strong>MOMO CODE: *182*8*1*------#</strong> Friday Restaurant
-                Ltd Or Via <strong>Airtel Money *182*8*1*88------#</strong>{" "}
+                <strong>MOMO CODE: *182*8*1*2353384# (Amos)</strong> Friday Restaurant
+                Ltd Or Via <strong>Airtel Money *182*8*1*882353384# (Amos)</strong>{" "}
                 Friday Restaurant Ltd. We then Deliver to where you are.
               </p>
             </div>
