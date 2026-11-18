@@ -50,7 +50,7 @@ export default function ContactPage() {
               rel="noopener noreferrer"
               className="flex gap-3"
             >
-              <MapPin className="text-friday" /> Kicukiro kw' Isonga
+              <MapPin className="text-friday" /> Kigali, Kicukiro
               <br />
               Kigali, Rwanda
             </a>
