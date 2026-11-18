@@ -470,7 +470,7 @@ export function StoreFooter() {
               rel="noopener noreferrer"
               className="flex gap-3"
             >
-              <MapPin size={18} className="text-friday" /> Kicukiro kw' Isonga, Kigali
+              <MapPin size={18} className="text-friday" /> Kigali, Kicukiro
             </a>
             <a href="tel:+250782578829" className="flex gap-3">
               <Phone size={18} className="text-friday" /> 0782578829
