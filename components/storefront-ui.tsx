@@ -465,7 +465,7 @@ export function StoreFooter() {
           <p className="font-display text-lg">Visit Friday</p>
           <div className="mt-5 space-y-3 text-sm text-stone-300">
             <a
-              href=""
+              href="https://maps.app.goo.gl/eBU9cRuow38Rpp316"
               target="_blank"
               rel="noopener noreferrer"
               className="flex gap-3"
