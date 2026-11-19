@@ -45,7 +45,7 @@ export default function ContactPage() {
           </h2>
           <div className="mt-8 space-y-6 text-sm text-stone-300">
             <a
-              href="pe"
+              href="https://maps.app.goo.gl/eBU9cRuow38Rpp316"
               target="_blank"
               rel="noopener noreferrer"
               className="flex gap-3"
