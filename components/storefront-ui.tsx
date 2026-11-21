@@ -148,18 +148,15 @@ function AccompanimentModal({
             </div>
           </div>
           <div className="mt-6">
-            <p className="mb-3 text-base font-bold text-sage sm:text-lg">
-              Bonus: 1 sambusa included
-            </p>
             <div className="mb-1 flex items-center justify-between gap-3">
               <h3 className="font-display text-xl">Choose your sides</h3>
               <span className="rounded-full bg-sage/10 px-3 py-1 text-xs font-bold text-sage">
-                {total} / 4 selected
+                {total} / 2 selected
               </span>
             </div>
             <div className="space-y-2.5">
               {accompanimentTypes.map((type) => {
-                const limit = total - selected[type] < 4;
+                const limit = total - selected[type] < 2;
                 return (
                   <div
                     key={type}
