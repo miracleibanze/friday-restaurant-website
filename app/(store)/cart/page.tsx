@@ -12,7 +12,8 @@ import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { cartItemKey, removeFromCart, updateCartItem } from "@/lib/store/store";
 import { displayFoodName } from "@/lib/food-utils";
 import { accompanimentLabel, isFullChicken } from "@/lib/accompaniments";
-import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
+import { FoodImage } from "@/components/FoodImage";
+import { ArrowRight, MessageCircle, Minus, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 export default function CartPage() {
@@ -23,6 +24,22 @@ export default function CartPage() {
     (sum, item) => sum + item.food.price * item.quantity,
     0,
   );
+  const whatsappMessage = [
+    "Hello, I would like to place this order:",
+    ...cart.flatMap((item) => {
+      const { food, quantity, accompaniments } = item;
+      const sides = accompanimentLabel(
+        accompaniments,
+        isFullChicken(food) ? quantity : 0,
+      );
+      return [
+        `- ${displayFoodName(food.name)} x${quantity} — ${money(food.price * quantity)}`,
+        ...(sides ? [`  Sides: ${sides}`] : []),
+      ];
+    }),
+    `Total: ${money(subtotal)}`,
+  ].join("\n");
+  const whatsappUrl = `https://wa.me/250782578829?text=${encodeURIComponent(whatsappMessage)}`;
   if (!initialized) return <CartPageSkeleton />;
   if (!cart.length)
     return (
@@ -47,7 +64,7 @@ export default function CartPage() {
               className="flex gap-4 rounded-3xl bg-white p-4 soft-ring"
             >
               <div className="size-28 shrink-0 overflow-hidden rounded-2xl bg-stone-100">
-                <img
+                <FoodImage
                   src={food.image}
                   alt={displayFoodName(food.name)}
                   className="size-full object-cover"
@@ -135,9 +152,20 @@ export default function CartPage() {
         <OrderSummary
           subtotal={subtotal}
           action={
-            <Link href="/checkout" className={`${buttonClass} w-full`}>
-              Continue to checkout <ArrowRight size={17} />
-            </Link>
+            <>
+              <Link href="/checkout" className={`${buttonClass} w-full`}>
+                Continue to checkout <ArrowRight size={17} />
+              </Link>
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3.5 text-sm font-bold text-white transition hover:bg-[#1fb95a]"
+              >
+                <MessageCircle size={17} />
+                Order with WhatsApp
+              </a>
+            </>
           }
         />
       </div>

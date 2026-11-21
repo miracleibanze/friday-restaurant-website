@@ -10,6 +10,7 @@ import {
   RefreshCw,
   Search,
   ShoppingBag,
+  Trash2,
   X,
 } from "lucide-react";
 import { StoreHeader } from "@/components/storefront-ui";
@@ -99,6 +100,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState("");
+  const [deletingId, setDeletingId] = useState("");
   const [activeSection, setActiveSection] = useState<
     "orders" | "menu" | "payments" | "inbox" | "reports" | "customers"
   >("orders");
@@ -260,6 +262,33 @@ export default function AdminDashboard() {
       );
     } finally {
       setUpdatingId("");
+    }
+  }
+
+  async function deleteOrder(order: Order) {
+    if (
+      !window.confirm(
+        `Permanently delete order ${order.orderNumber}? This cannot be undone.`,
+      )
+    ) {
+      return;
+    }
+    setDeletingId(order.id);
+    setPageError("");
+    try {
+      await readJson(
+        await fetch(`/api/admin/orders?id=${encodeURIComponent(order.id)}`, {
+          method: "DELETE",
+        }),
+      );
+      setSelected((current) => (current?.id === order.id ? null : current));
+      await loadOrders();
+    } catch (error) {
+      setPageError(
+        error instanceof Error ? error.message : "Could not delete order.",
+      );
+    } finally {
+      setDeletingId("");
     }
   }
 
@@ -564,6 +593,16 @@ export default function AdminDashboard() {
                             className="rounded-xl border border-sage px-3 py-2 text-sm font-bold bg-sage text-white transition hover:scale-105"
                           >
                             Details
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void deleteOrder(order)}
+                            disabled={deletingId === order.id || updatingId === order.id}
+                            aria-label={`Delete order ${order.orderNumber}`}
+                            className="inline-flex items-center gap-1 rounded-xl border border-red-200 px-3 py-2 text-sm font-bold text-red-700 hover:bg-red-50 disabled:opacity-50"
+                          >
+                            <Trash2 size={15} />
+                            {deletingId === order.id ? "Deleting…" : "Delete"}
                           </button>
                         </div>
                       </div>

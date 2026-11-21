@@ -70,7 +70,12 @@ function validateFields(body: Record<string, unknown>) {
       : body.longDescription === undefined
         ? ""
         : null;
-  const image = typeof body.image === "string" ? body.image.trim() : "";
+  const image =
+    typeof body.image === "string"
+      ? body.image.trim()
+      : body.image === undefined
+        ? ""
+        : null;
   const price = Number(body.price);
   const prepTime = Number(body.prepTime);
   if (
@@ -80,7 +85,7 @@ function validateFields(body: Record<string, unknown>) {
     description.length > 1000 ||
     longDescription === null ||
     longDescription.length > 5000 ||
-    !image ||
+    image === null ||
     !validImageDataUrl(image) ||
     !Number.isFinite(price) ||
     price < 0 ||

@@ -34,6 +34,7 @@ import {
 } from "@/lib/accompaniments";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { FoodImage } from "@/components/FoodImage";
 
 export const money = (value: number) =>
   `${new Intl.NumberFormat("en-RW").format(value)} RWF`;
@@ -91,7 +92,7 @@ function AccompanimentModal({
         className="flex max-h-full w-full max-w-lg flex-col overflow-hidden rounded-[1.75rem] bg-[#fcfcfc] food-shadow sm:rounded-[2rem]"
       >
         <div className="relative h-36 shrink-0 overflow-hidden sm:h-44">
-          <img
+          <FoodImage
             src={food.image}
             alt={displayFoodName(food.name)}
             className="size-full object-cover"
@@ -572,7 +573,7 @@ export function FoodCard({
         href={`/food/${food.slug}`}
         className="relative block aspect-[4/3] overflow-hidden bg-stone-100"
       >
-        <img
+        <FoodImage
           src={food.image}
           alt={displayFoodName(food.name)}
           className="size-full object-cover transition duration-700 group-hover:scale-105"

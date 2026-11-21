@@ -8,6 +8,7 @@ import {
   type FormEvent,
 } from "react";
 import { money } from "@/components/storefront-ui";
+import { FoodImage } from "@/components/FoodImage";
 import type { Food } from "@/lib/menu-data";
 import { displayFoodName } from "@/lib/food-utils";
 import { Trash2, X } from "lucide-react";
@@ -388,7 +389,7 @@ function MenuManagement() {
               </label>
               {form.image && (
                 <div className="flex items-center gap-4 sm:col-span-2">
-                  <img
+                  <FoodImage
                     src={form.image}
                     alt="Menu item preview"
                     className="size-24 rounded-xl bg-stone-100 object-cover"
@@ -443,7 +444,7 @@ function MenuManagement() {
               </label>
               <div className="flex flex-wrap gap-2 sm:col-span-2">
                 <button
-                  disabled={saving || imageReading || !form.image}
+                  disabled={saving || imageReading}
                   className="rounded-full bg-charcoal px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50"
                 >
                   {saving
@@ -542,6 +543,7 @@ function PaymentManagement() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(0);
+  const [deletingId, setDeletingId] = useState("");
   useEffect(() => {
     let active = true;
     setLoading(true);
@@ -591,6 +593,29 @@ function PaymentManagement() {
       );
     }
   };
+  const deleteOrder = async (order: PayOrder) => {
+    if (
+      !window.confirm(
+        `Permanently delete order ${order.orderNumber}? This cannot be undone.`,
+      )
+    ) {
+      return;
+    }
+    setDeletingId(order.id);
+    setError("");
+    try {
+      await requestJson(`/api/admin/orders?id=${encodeURIComponent(order.id)}`, {
+        method: "DELETE",
+      });
+      setRefresh((value) => value + 1);
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "Could not delete order.",
+      );
+    } finally {
+      setDeletingId("");
+    }
+  };
   return (
     <Panel
       title="Payment tracking"
@@ -617,7 +642,13 @@ function PaymentManagement() {
       ) : orders.length ? (
         <div className="mt-4 divide-y divide-stone-100">
           {orders.map((order) => (
-            <PaymentRow key={order.id} order={order} onSave={savePayment} />
+            <PaymentRow
+              key={order.id}
+              order={order}
+              onSave={savePayment}
+              onDelete={deleteOrder}
+              deleting={deletingId === order.id}
+            />
           ))}
         </div>
       ) : (
@@ -642,9 +673,13 @@ function PaymentManagement() {
 function PaymentRow({
   order,
   onSave,
+  onDelete,
+  deleting,
 }: {
   order: PayOrder;
   onSave: (id: string, status: string, reference: string) => Promise<void>;
+  onDelete: (order: PayOrder) => Promise<void>;
+  deleting: boolean;
 }) {
   const [status, setStatus] = useState(order.paymentStatus || "pending");
   const [reference, setReference] = useState(order.paymentReference || "");
@@ -657,7 +692,7 @@ function PaymentRow({
         await onSave(order.id, status, reference);
         setSaving(false);
       }}
-      className="grid gap-3 py-4 md:grid-cols-[1fr_140px_1fr_auto] md:items-center"
+      className="grid gap-3 py-4 md:grid-cols-[1fr_140px_1fr_auto_auto] md:items-center"
     >
       <div>
         <p className="font-bold">
@@ -693,10 +728,20 @@ function PaymentRow({
         onChange={(event) => setReference(event.target.value)}
       />
       <button
-        disabled={saving}
+        disabled={saving || deleting}
         className="rounded-lg bg-charcoal px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50"
       >
         {saving ? "Saving…" : "Save"}
+      </button>
+      <button
+        type="button"
+        onClick={() => void onDelete(order)}
+        disabled={saving || deleting}
+        aria-label={`Delete order ${order.orderNumber}`}
+        className="inline-flex items-center justify-center gap-1 rounded-lg border border-red-200 px-3 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50 disabled:opacity-50"
+      >
+        <Trash2 size={15} />
+        {deleting ? "Deleting…" : "Delete"}
       </button>
     </form>
   );
@@ -720,6 +765,7 @@ function MessageInbox() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(0);
+  const [deletingId, setDeletingId] = useState("");
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -755,6 +801,30 @@ function MessageInbox() {
       setError(
         cause instanceof Error ? cause.message : "Could not update message.",
       );
+    }
+  }
+  async function deleteMessage(item: Message) {
+    if (
+      !window.confirm(
+        `Permanently delete the message "${item.subject}" from ${item.name}? This cannot be undone.`,
+      )
+    ) {
+      return;
+    }
+    setDeletingId(item.id);
+    setError("");
+    try {
+      await requestJson(
+        `/api/admin/messages?id=${encodeURIComponent(item.id)}`,
+        { method: "DELETE" },
+      );
+      setRefresh((value) => value + 1);
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "Could not delete message.",
+      );
+    } finally {
+      setDeletingId("");
     }
   }
   return (
@@ -805,6 +875,16 @@ function MessageInbox() {
               >
                 Reply by email
               </a>
+              <button
+                type="button"
+                onClick={() => void deleteMessage(item)}
+                disabled={deletingId === item.id}
+                aria-label={`Delete message ${item.subject}`}
+                className="ml-2 inline-flex items-center gap-1 rounded-full border border-red-200 px-4 py-2 text-sm font-bold text-red-700 hover:bg-red-50 disabled:opacity-50"
+              >
+                <Trash2 size={15} />
+                {deletingId === item.id ? "Deleting…" : "Delete"}
+              </button>
             </article>
           ))}
         </div>

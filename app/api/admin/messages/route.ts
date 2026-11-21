@@ -85,3 +85,22 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Could not update contact message." }, { status: 500 });
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    if (!(await requireAdmin(request))) {
+      return NextResponse.json({ error: "Administrator access required." }, { status: 403 });
+    }
+    const id = request.nextUrl.searchParams.get("id");
+    if (!id || !isValidObjectId(id)) {
+      return NextResponse.json({ error: "A valid message id is required." }, { status: 400 });
+    }
+    await connectToDatabase();
+    const message = await ContactMessage.findByIdAndDelete(id);
+    if (!message) return NextResponse.json({ error: "Message not found." }, { status: 404 });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Could not delete contact message.", error);
+    return NextResponse.json({ error: "Could not delete contact message." }, { status: 500 });
+  }
+}

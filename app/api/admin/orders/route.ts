@@ -124,3 +124,22 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Could not update order status." }, { status: 500 });
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    if (!(await requireAdmin(request))) {
+      return NextResponse.json({ error: "Administrator access required." }, { status: 403 });
+    }
+    const id = request.nextUrl.searchParams.get("id");
+    if (!id || !isValidObjectId(id)) {
+      return NextResponse.json({ error: "A valid order id is required." }, { status: 400 });
+    }
+    await connectToDatabase();
+    const order = await Order.findByIdAndDelete(id);
+    if (!order) return NextResponse.json({ error: "Order not found." }, { status: 404 });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Could not delete order.", error);
+    return NextResponse.json({ error: "Could not delete order." }, { status: 500 });
+  }
+}

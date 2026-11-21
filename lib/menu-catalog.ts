@@ -32,7 +32,7 @@ export function serializeMenuItem(item: {
     price: item.price,
     available: item.available,
     prepTime: item.prepTime,
-    image: item.image,
+    image: item.image ?? "",
     rating: item.rating,
     calories: item.calories,
   };

@@ -8,6 +8,7 @@ import {
 } from "@/components/storefront-ui";
 import { FoodDetailsSkeleton } from "@/components/loading-skeletons";
 import { displayFoodName } from "@/lib/food-utils";
+import { FoodImage } from "@/components/FoodImage";
 import { Check, Clock3, Minus, Plus, Star } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -183,7 +184,7 @@ export default function FoodDetailsPage({ slug }: FoodDetailsProps) {
       </Link>
       <div className="grid gap-12 lg:grid-cols-2">
         <div className="relative aspect-square overflow-hidden rounded-[2.5rem] bg-white food-shadow">
-          <img
+          <FoodImage
             src={food.image}
             alt={displayFoodName(food.name)}
             className="size-full object-cover"
